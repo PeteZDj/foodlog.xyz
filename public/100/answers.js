@@ -109,3 +109,11 @@ window.ANSWERS = {
   99: { status:"doing", text:"Chase PMF: sticky daily logging and strong retention." },
   100:{ status:"doing", text:"Evaluate expansion: coaching, wearable integrations and B2B (clinics and wellness programs)." }
 };
+
+/* __DESIGN__ brand-adaptive design tokens for the /100 page */
+window.SITE.design = {"mode":"dark","primary":"#16a34a","accent":"#f59e0b","scale":"#0ea5e9","launch":"#8b5cf6","setup":"#16a34a","bg":"#0b0f14","bg2":"#111722","card":"#141c28","line":"#20293a","radius":16,"headFont":"'Manrope'","bodyFont":"'Manrope'","fontLink":"https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap","logo":"/favicon.svg"};
+/* __END_DESIGN__ */
+
+/* __DESIGN__ brand-adaptive design tokens for the /100 page */
+window.SITE.design = {"mode":"dark","primary":"#16a34a","accent":"#f59e0b","scale":"#0ea5e9","launch":"#8b5cf6","setup":"#16a34a","bg":"#0b0f14","bg2":"#111722","card":"#141c28","line":"#20293a","radius":16,"headFont":"'Manrope'","bodyFont":"'Manrope'","fontLink":"https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap","logo":"/favicon.svg"};
+/* __END_DESIGN__ */

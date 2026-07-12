@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   title: "Foodlog — Daily nutrition, clearly.",
   description:
     "A precise food journal for people who want the full picture. Log meals, inspect nutrients, and understand patterns from today to the entire year.",
+  icons: { icon: [{ url: "/favicon.svg", type: "image/svg+xml" }] },
 };
 
 export default function RootLayout({
