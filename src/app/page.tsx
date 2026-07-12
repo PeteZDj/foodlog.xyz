@@ -113,8 +113,11 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 md:px-12 py-8 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-600">
+      <footer className="px-6 md:px-12 py-8 border-t border-zinc-800 flex items-center justify-between gap-4 text-xs text-zinc-600">
         <span>© {new Date().getFullYear()} Foodlog</span>
+        <a href="/downloads/foodlog.apk" download className="font-mono text-zinc-400 hover:text-emerald-400 transition-colors">
+          ↓ Get the Android app
+        </a>
         <span className="font-mono">Daily nutrition, clearly.</span>
       </footer>
     </div>
