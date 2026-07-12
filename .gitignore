@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# .NET / MAUI mobile app build artifacts (the shippable APK is copied to
+# public/downloads/foodlog.apk, which is tracked; these build outputs are not)
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
+*.binlog
+*.aab
+!public/downloads/foodlog.apk
