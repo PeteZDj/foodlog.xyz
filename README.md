@@ -34,3 +34,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+## Mobile App (React Native)
+
+<img src="foodlog-rn/assets/images/icon.png" alt="FoodLog app icon" width="72" align="left" />
+
+**FoodLog for Android** is a native mobile app built with **React Native (Expo)** -- log meals and track your daily nutrition, clearly.
+
+**[Download the Android app](https://foodlog.xyz/downloads/foodlog.apk)**
+
+- **Source:** [`foodlog-rn/`](foodlog-rn) -- the full Expo Router + TypeScript project.
+- **Stack:** Expo SDK 57, Expo Router, TypeScript, React Native, AsyncStorage.
+- Runs on Android 7.0+ (arm64 / armv7). You may need to allow *install from unknown sources*.
+
+<br clear="left" />
