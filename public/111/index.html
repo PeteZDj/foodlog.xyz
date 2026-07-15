@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The 111 · Startup Playbook</title>
+<meta name="robots" content="index, follow" />
+<meta name="description" content="The 111 Playbook — 111 tasks from idea to 10,000 users and a first VC cheque — answered for this venture as a live checklist across 11 phases." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<style>
+  :root{
+    /* LIGHT defaults — overridden per-site (and for dark mode) from SITE.design */
+    --primary:#0071bc; --accent:#4b8b3b;
+    --ink:#0f172a; --sub:#5b6b7b;
+    --bg:#ffffff; --bg2:#f5f7fb; --card:#ffffff; --line:#e6ebf1;
+    --done:#16a34a; --doing:#e08600; --todo:#94a3b8;
+    --radius:16px;
+    --head:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --body:"Open Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --shadow:0 1px 2px rgba(15,23,42,.05),0 10px 34px rgba(15,23,42,.06);
+    --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+    --headerbg:rgba(255,255,255,.82);
+    --tint:color-mix(in srgb, var(--primary) 6%, var(--bg));
+    --pagegrad:radial-gradient(1200px 640px at 100% -320px, color-mix(in srgb, var(--primary) 10%, var(--bg)), var(--bg) 60%);
+  }
+  html[data-mode="dark"]{
+    --ink:#eef2f7; --sub:#9aa7b4;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 40px rgba(0,0,0,.35);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.35);
+    --headerbg:color-mix(in srgb, var(--bg) 78%, transparent);
+    --tint:color-mix(in srgb, var(--primary) 14%, var(--card));
+    --pagegrad:radial-gradient(1200px 640px at 50% -260px, var(--bg2), var(--bg) 62%);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--body);background:var(--pagegrad) fixed;color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  h1,h2,h3,.t-name,.brand b{font-family:var(--head)}
+  a{color:var(--primary);text-decoration:none}
+  .wrap{max-width:960px;margin:0 auto;padding:0 18px}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--headerbg);backdrop-filter:blur(12px);position:sticky;top:0;z-index:20}
+  .top .wrap{display:flex;align-items:center;justify-content:space-between;height:66px;gap:12px}
+  .brand{display:flex;align-items:center;gap:12px;min-width:0}
+  .brand .logo{width:38px;height:38px;border-radius:11px;object-fit:cover;box-shadow:var(--shadow-sm);flex:0 0 auto;background:var(--card)}
+  .brand .logo.mark{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px;letter-spacing:.3px;background:linear-gradient(135deg,var(--primary),var(--accent))}
+  .brand .txt{min-width:0}
+  .brand b{display:block;font-weight:800;font-size:16px;letter-spacing:.2px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand small{display:block;font-weight:500;color:var(--sub);font-size:11px;letter-spacing:.5px}
+  .home{font-size:13px;color:var(--ink);font-weight:600;border:1px solid var(--line);padding:8px 14px;border-radius:99px;white-space:nowrap;transition:.15s;background:var(--card)}
+  .home:hover{border-color:var(--primary);color:var(--primary)}
+
+  .hero{padding:46px 0 8px}
+  .kicker{color:var(--primary);font-weight:700;font-size:12px;letter-spacing:2.2px;text-transform:uppercase}
+  h1{font-size:40px;margin:12px 0 8px;line-height:1.05;font-weight:800;letter-spacing:-.5px}
+  h1 b{background:linear-gradient(120deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--sub);max-width:680px;font-size:15.5px}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:calc(var(--radius) + 4px);padding:20px;margin:22px 0;box-shadow:var(--shadow)}
+  .prog-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .ring{--p:0;width:78px;height:78px;border-radius:50%;background:conic-gradient(var(--primary) calc(var(--p)*1%),color-mix(in srgb,var(--line) 70%,transparent) 0);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .ring .inner{width:60px;height:60px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;font-family:var(--head)}
+  .prog-meta{flex:1;min-width:220px}
+  .bar{height:9px;background:color-mix(in srgb,var(--line) 80%,transparent);border-radius:99px;overflow:hidden;margin-top:9px}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width .5s cubic-bezier(.3,.8,.3,1)}
+  .counts{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--sub)}
+  .counts b{color:var(--ink);font-weight:700}
+  .swatch{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:middle}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 2px}
+  .chip{border:1px solid var(--line);background:var(--card);color:var(--sub);padding:8px 13px;border-radius:99px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--body)}
+  .chip.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:var(--shadow-sm)}
+  .chip:hover:not(.active){color:var(--ink);border-color:color-mix(in srgb,var(--primary) 45%,var(--line))}
+  .chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .phases{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 2px}
+  .phases .chip{padding:6px 11px;font-size:12px}
+  .search{margin-left:auto;flex:1;min-width:160px;max-width:290px;background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:11px;padding:10px 13px;font-size:13px;font-family:var(--body)}
+  .search:focus{outline:none;border-color:var(--primary)}
+  .btns{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+  .btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 15px;border-radius:11px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;gap:7px;align-items:center;font-family:var(--body);transition:.15s}
+  .btn:hover{border-color:color-mix(in srgb,var(--primary) 45%,var(--line))}
+  .btn.primary{background:linear-gradient(135deg,var(--primary),var(--accent));border:0;color:#fff;box-shadow:var(--shadow-sm)}
+  .btn.primary:hover{filter:brightness(1.06)}
+
+  .stage-h{display:flex;align-items:baseline;gap:11px;margin:34px 0 4px}
+  .stage-h .tag{font-size:11px;font-weight:800;letter-spacing:1.5px;padding:4px 10px;border-radius:7px;color:#fff}
+  .stage-h h2{font-size:21px;margin:0;font-weight:800}
+  .stage-h .rng{color:var(--sub);font-size:12.5px;margin-left:auto}
+  .stage-out{color:var(--sub);font-size:12.5px;margin:2px 0 6px;font-style:italic}
+
+  .task{display:flex;gap:14px;padding:15px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);margin-bottom:10px;transition:.15s;box-shadow:var(--shadow-sm);border-left-width:4px}
+  .task:hover{border-color:color-mix(in srgb,var(--primary) 40%,var(--line));transform:translateY(-1px)}
+  .task.checked{opacity:.6}
+  .cb{flex:0 0 auto;margin-top:2px}
+  .cb input{appearance:none;-webkit-appearance:none;width:22px;height:22px;border:2px solid color-mix(in srgb,var(--sub) 55%,var(--line));border-radius:7px;cursor:pointer;position:relative;background:var(--bg)}
+  .cb input:checked{background:var(--done);border-color:var(--done)}
+  .cb input:checked::after{content:"\2713";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900}
+  .t-body{flex:1;min-width:0}
+  .t-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .num{font-family:ui-monospace,"JetBrains Mono",monospace;font-size:12px;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+  .t-name{font-weight:700;font-size:15px}
+  .task.checked .t-name{text-decoration:line-through;text-decoration-color:var(--sub)}
+  .pill{font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:2px 9px;border-radius:99px;margin-left:auto}
+  .pill.done{background:color-mix(in srgb,var(--done) 18%,transparent);color:var(--done)}
+  .pill.doing{background:color-mix(in srgb,var(--doing) 20%,transparent);color:var(--doing)}
+  .pill.todo{background:color-mix(in srgb,var(--todo) 22%,transparent);color:var(--todo)}
+  .what{color:var(--sub);font-size:12.5px;margin:7px 0 0}
+  .answer{margin-top:10px;font-size:13.5px;background:var(--tint);border-left:3px solid var(--primary);border-radius:0 11px 11px 0;padding:10px 13px}
+  .answer .lab{display:block;font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--primary);margin-bottom:3px}
+  footer{border-top:1px solid var(--line);margin-top:48px;padding:28px 0 64px;color:var(--sub);font-size:12.5px}
+  footer .fbrand{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  footer .fbrand img{width:26px;height:26px;border-radius:8px}
+  .hidden{display:none!important}
+  @media(max-width:560px){h1{font-size:30px}.top .wrap{height:58px}.brand small{display:none}}
+  @media print{header.top,.controls,.phases,.btns,.search,.ring{display:none}.task{break-inside:avoid;box-shadow:none}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand">
+    <img class="logo" id="blogo" alt="" />
+    <span class="txt"><b id="bname">The 111</b><small id="btag">The 111 · Startup Playbook</small></span>
+  </div>
+  <a class="home" id="bhome" href="/">&larr; Back to site</a>
+</div></header>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="kicker" id="kicker">The 111 Playbook</div>
+    <h1 id="title">The <b>111</b>, answered.</h1>
+    <p class="lede" id="lede"></p>
+  </section>
+
+  <div class="panel">
+    <div class="prog-row">
+      <div class="ring" id="ring"><div class="inner"><span id="ringpct">0%</span></div></div>
+      <div class="prog-meta">
+        <div style="display:flex;justify-content:space-between;font-size:13px"><strong id="progtitle">Completed</strong><span id="progcount" style="color:var(--sub)">0 / 111</span></div>
+        <div class="bar"><i id="barfill"></i></div>
+        <div class="counts">
+          <span><span class="swatch" style="background:var(--done)"></span><b id="cDone">0</b> done</span>
+          <span><span class="swatch" style="background:var(--doing)"></span><b id="cDoing">0</b> in progress</span>
+          <span><span class="swatch" style="background:var(--todo)"></span><b id="cTodo">0</b> to do</span>
+          <span><b>11</b> phases &middot; <b>111</b> tasks</span>
+        </div>
+      </div>
+    </div>
+    <div class="btns">
+      <a class="btn primary" id="dl" href="#">&#8681; Download the full playbook (.md)</a>
+      <button class="btn" id="expand">Collapse answers</button>
+      <button class="btn" id="print">Print / PDF</button>
+      <button class="btn" id="reset">Reset my progress</button>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="chip active" data-f="all">All</button>
+    <button class="chip" data-f="todo">To do</button>
+    <button class="chip" data-f="doing">In progress</button>
+    <button class="chip" data-f="done">Done</button>
+    <input class="search" id="search" placeholder="Search 111 tasks\u2026" />
+  </div>
+  <div class="phases" id="phaseChips"></div>
+
+  <div id="list"></div>
+
+  <footer>
+    <div class="fbrand"><img id="flogo" alt="" /><strong id="fname">The 111</strong> &middot; <span id="fdomain"></span></div>
+    <p>Framework: <em>The 111 Playbook</em> &mdash; 111 tasks from a raw idea to 10,000 users, 10,000 followers and 10,000 transactions, then your first VC cheque, across 11 phases. Full deep-dive guides at <a id="pblink" href="https://111.pete.ke">111.pete.ke</a>. Answers on this page are this venture's own assessment and recommendations.</p>
+  </footer>
+</div>
+
+<script src="./tasks.js"></script>
+<script src="./answers.js"></script>
+<script>
+(function(){
+  var S = window.SITE || {};
+  var A = window.ANSWERS || {};
+  var T = window.PLAYBOOK_TASKS || [];
+  var P = window.PLAYBOOK_PHASES || [];
+  var KEY = "playbook111:" + (S.domain || location.host);
+  var D = S.design || {};
+  var theme = S.theme || {};
+
+  // ---- palette: design tokens win, then legacy theme, then :root defaults ----
+  var mode = D.mode || (theme.bg ? "dark" : "light");
+  document.documentElement.setAttribute("data-mode", mode);
+  var pal = {
+    primary: D.primary || theme.primary,
+    accent:  D.accent  || theme.accent,
+    bg:  D.bg  || theme.bg,
+    bg2: D.bg2 || theme.bg2,
+    card:D.card|| theme.card,
+    line:D.line|| theme.line,
+    ink: D.ink,
+    sub: D.sub
+  };
+  var rs = document.documentElement.style;
+  for (var k in pal){ if(pal[k]) rs.setProperty("--"+k, pal[k]); }
+  if (D.radius) rs.setProperty("--radius", (typeof D.radius==="number"?D.radius+"px":D.radius));
+  if (D.headFont) rs.setProperty("--head", D.headFont + ',system-ui,sans-serif');
+  if (D.bodyFont) rs.setProperty("--body", D.bodyFont + ',system-ui,sans-serif');
+
+  // ---- fonts ----
+  if (D.fontLink){
+    var pc=document.createElement("link"); pc.rel="preconnect"; pc.href="https://fonts.gstatic.com"; pc.crossOrigin=""; document.head.appendChild(pc);
+    var fl=document.createElement("link"); fl.rel="stylesheet"; fl.href=D.fontLink; document.head.appendChild(fl);
+  }
+
+  // ---- brand header/footer ----
+  var logo = D.logo || "/favicon.svg";
+  var blogo=document.getElementById("blogo"), flogo=document.getElementById("flogo");
+  function useMark(el){ el.replaceWith((function(){ var s=document.createElement("span"); s.className=el.className+" mark"; s.textContent=S.mark||"111"; s.id=el.id; return s; })()); }
+  if (logo){ blogo.src=logo; blogo.onerror=function(){ useMark(this); }; flogo.src=logo; flogo.onerror=function(){ this.style.display="none"; }; }
+  else { useMark(blogo); flogo.style.display="none"; }
+
+  document.getElementById("bname").textContent = S.name || "The 111";
+  document.getElementById("btag").textContent = S.tagline || "The 111 · Startup Playbook";
+  document.getElementById("fname").textContent = S.name || "";
+  if (S.domain) document.getElementById("bhome").href = "https://" + S.domain;
+  document.getElementById("kicker").textContent = "The 111 Playbook \u00b7 " + (S.name||"");
+  document.getElementById("lede").textContent = S.lede || "Every one of the 111 playbook tasks, answered for this venture, with our current status and next move. Tick tasks off — your progress is saved on this device.";
+  var dom = document.getElementById("fdomain");
+  if (S.domain){ var hl=document.createElement("a"); hl.href="https://"+S.domain; hl.textContent=S.domain; dom.appendChild(hl); }
+
+  // ---- phase lookup ----
+  var phaseMap = {};
+  P.forEach(function(p){ phaseMap[p.id]=p; });
+  function phaseColor(id){ return (phaseMap[id]||{}).color || "var(--primary)"; }
+
+  // ---- phase filter chips ----
+  var phaseChipsEl = document.getElementById("phaseChips");
+  P.forEach(function(p){
+    var c=document.createElement("button"); c.className="chip"; c.setAttribute("data-f","p"+p.id);
+    c.innerHTML='<span class="dot" style="background:'+p.color+'"></span>'+p.id+'. '+esc(p.short);
+    phaseChipsEl.appendChild(c);
+  });
+
+  var saved;
+  try { saved = JSON.parse(localStorage.getItem(KEY)||"null"); } catch(e){ saved=null; }
+  var done = {};
+  if (saved && saved.done){ done = saved.done; }
+  else { T.forEach(function(t){ if((A[t.n]||{}).status==="done") done[t.n]=true; }); }
+  function persist(){ try{ localStorage.setItem(KEY, JSON.stringify({done:done})); }catch(e){} }
+
+  var listEl = document.getElementById("list");
+  var curFilter = "all", curSearch = "";
+
+  function render(){
+    listEl.innerHTML="";
+    var lastPhase=null, shown=0;
+    T.forEach(function(t){
+      var ans = A[t.n] || {status:"todo", text:""};
+      if (curFilter==="done" && !( (done[t.n])||false )) return;
+      if (curFilter==="todo" && ans.status!=="todo") return;
+      if (curFilter==="doing" && ans.status!=="doing") return;
+      if (curFilter && curFilter.charAt(0)==="p" && /^p\d+$/.test(curFilter)){ if(t.phase!==Number(curFilter.slice(1))) return; }
+      if (curSearch){ var hay=(t.name+" "+t.what+" "+(ans.text||"")).toLowerCase(); if(hay.indexOf(curSearch)<0) return; }
+      shown++;
+      if (t.phase!==lastPhase){
+        lastPhase=t.phase;
+        var p=phaseMap[t.phase]||{title:"Phase "+t.phase,range:[t.n,t.n]};
+        var sh=document.createElement("div"); sh.className="stage-h";
+        sh.innerHTML='<span class="tag" style="background:'+p.color+'">PHASE '+t.phase+'</span><h2>'+esc(p.title||"")+'</h2><span class="rng">Tasks '+p.range[0]+'\u2013'+p.range[1]+'</span>';
+        listEl.appendChild(sh);
+      }
+
+      var isDone = !!done[t.n];
+      var el=document.createElement("div"); el.className="task"+(isDone?" checked":"");
+      el.style.borderLeftColor = phaseColor(t.phase);
+      var pillClass = ans.status==="done"?"done":ans.status==="doing"?"doing":"todo";
+      var pillText = ans.status==="done"?"Done":ans.status==="doing"?"In progress":"To do";
+      el.innerHTML =
+        '<label class="cb"><input type="checkbox" '+(isDone?"checked":"")+' data-n="'+t.n+'"></label>'+
+        '<div class="t-body">'+
+          '<div class="t-top"><span class="num">#'+t.n+'</span><span class="t-name">'+esc(t.name)+'</span><span class="pill '+pillClass+'">'+pillText+'</span></div>'+
+          '<div class="what">'+esc(t.what)+'</div>'+
+          (ans.text?('<div class="answer"><span class="lab">'+esc(S.name||"Our")+' \u2014 our answer</span>'+esc(ans.text)+'</div>'):'')+
+        '</div>';
+      listEl.appendChild(el);
+    });
+    if(!shown){ var e=document.createElement("p"); e.style.color="var(--sub)"; e.style.padding="20px 4px"; e.textContent="No tasks match."; listEl.appendChild(e); }
+    updateProgress();
+  }
+
+  function esc(s){ return String(s==null?"":s).replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];}); }
+
+  function updateProgress(){
+    var d=0; T.forEach(function(t){ if(done[t.n]) d++; });
+    var pct=T.length?Math.round(d/T.length*100):0;
+    document.getElementById("ring").style.setProperty("--p",pct);
+    document.getElementById("ringpct").textContent=pct+"%";
+    document.getElementById("progcount").textContent=d+" / "+T.length;
+    document.getElementById("barfill").style.width=pct+"%";
+    var cd=0,cg=0,ct=0; T.forEach(function(t){ var s=(A[t.n]||{}).status; if(s==="done")cd++; else if(s==="doing")cg++; else ct++; });
+    document.getElementById("cDone").textContent=cd;
+    document.getElementById("cDoing").textContent=cg;
+    document.getElementById("cTodo").textContent=ct;
+  }
+
+  listEl.addEventListener("change", function(e){
+    var cb=e.target.closest("input[type=checkbox]"); if(!cb) return;
+    var n=cb.getAttribute("data-n"); if(cb.checked) done[n]=true; else delete done[n];
+    cb.closest(".task").classList.toggle("checked",cb.checked);
+    persist(); updateProgress();
+  });
+
+  document.addEventListener("click", function(e){
+    var c=e.target.closest(".chip"); if(!c) return;
+    document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("active")}); c.classList.add("active");
+    curFilter=c.getAttribute("data-f"); render();
+  });
+  document.getElementById("search").addEventListener("input",function(e){ curSearch=e.target.value.trim().toLowerCase(); render(); });
+  document.getElementById("reset").addEventListener("click",function(){ if(confirm("Clear your saved progress on this device?")){ done={}; T.forEach(function(t){ if((A[t.n]||{}).status==="done") done[t.n]=true; }); persist(); render(); } });
+  document.getElementById("print").addEventListener("click",function(){ window.print(); });
+
+  function statusMd(s){ return s==="done"?"\u2705 Done":s==="doing"?"\uD83D\uDFE1 In progress":"\u2B1C To do"; }
+  function buildMarkdown(){
+    var c={done:0,doing:0,todo:0}; T.forEach(function(t){ c[(A[t.n]||{}).status||"todo"]++; });
+    var md="# The 111 Playbook \u2014 "+(S.name||"")+"\n\n";
+    md+="> **"+(S.name||"")+"** \u00b7 "+(S.domain||"")+"\n>\n> "+(S.lede||"")+"\n\n";
+    md+="**Progress snapshot:** \u2705 "+c.done+" done \u00b7 \uD83D\uDFE1 "+c.doing+" in progress \u00b7 \u2B1C "+c.todo+" to do (of 111).\n\n";
+    md+="Framework: *The 111 Playbook* \u2014 111 tasks across 11 phases, from idea to 10,000 users and a first VC cheque. Deep-dive guides: https://111.pete.ke \u00b7 Live checklist: https://"+(S.domain||"")+"/111\n\n---\n";
+    var lp=null;
+    T.forEach(function(t){
+      if(t.phase!==lp){ lp=t.phase; var p=phaseMap[t.phase]||{title:"Phase "+t.phase,range:[t.n,t.n]}; md+="\n## Phase "+t.phase+" \u2014 "+(p.title||"")+" (Tasks "+p.range[0]+"\u2013"+p.range[1]+")\n\n"; }
+      var a=A[t.n]||{status:"todo",text:""};
+      md+="- ["+(a.status==="done"?"x":" ")+"] **#"+t.n+" \u00b7 "+t.name+"** \u2014 "+statusMd(a.status)+"\n";
+      md+="  - *Task:* "+t.what+"\n";
+      md+="  - *"+(S.name||"Us")+":* "+(a.text||"")+"\n";
+    });
+    md+="\n---\n\n_Answers are "+(S.name||"")+"'s own assessment and recommendations. Framework: The 111 Playbook (111.pete.ke)._\n";
+    return md;
+  }
+  document.getElementById("dl").addEventListener("click",function(e){
+    e.preventDefault();
+    var blob=new Blob([buildMarkdown()],{type:"text/markdown;charset=utf-8"});
+    var url=URL.createObjectURL(blob), a=document.createElement("a");
+    a.href=url; a.download=(S.domain||"site")+"-111-playbook.md";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); },1500);
+  });
+  var expanded=true;
+  document.getElementById("expand").addEventListener("click",function(){ expanded=!expanded; document.querySelectorAll(".answer").forEach(function(a){a.classList.toggle("hidden",!expanded)}); this.textContent=expanded?"Collapse answers":"Expand answers"; });
+
+  render();
+})();
+</script>
+</body>
+</html>
