@@ -113,11 +113,19 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 md:px-12 py-8 border-t border-zinc-800 flex items-center justify-between gap-4 text-xs text-zinc-600">
+      <footer className="px-6 md:px-12 py-8 border-t border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-600">
         <span>© {new Date().getFullYear()} Foodlog</span>
-        <a href="/downloads/foodlog.apk" download className="font-mono text-zinc-400 hover:text-emerald-400 transition-colors">
-          ↓ Get the Android app
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <a href="mailto:team@foodlog.xyz" className="text-zinc-400 hover:text-emerald-400 transition-colors">
+            ✉ team@foodlog.xyz
+          </a>
+          <a href="https://docall.app/call/foodlog.xyz" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-emerald-400 transition-colors">
+            ☎ Call us on Docall
+          </a>
+          <a href="/downloads/foodlog.apk" download className="font-mono text-zinc-400 hover:text-emerald-400 transition-colors">
+            ↓ Get the Android app
+          </a>
+        </div>
         <span className="font-mono">Daily nutrition, clearly.</span>
       </footer>
     </div>
