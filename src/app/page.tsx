@@ -119,8 +119,8 @@ export default function Home() {
           <a href="mailto:team@foodlog.xyz" className="text-zinc-400 hover:text-emerald-400 transition-colors">
             ✉ team@foodlog.xyz
           </a>
-          <a href="https://docall.app/call/foodlog.xyz" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-emerald-400 transition-colors">
-            ☎ Call us on Docall
+          <a href="https://docall.app/foodlog.xyz" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-emerald-400 transition-colors">
+            ☎ Call us on <span className="underline underline-offset-2">docall.app/foodlog.xyz</span>
           </a>
           <a href="/downloads/foodlog.apk" download className="font-mono text-zinc-400 hover:text-emerald-400 transition-colors">
             ↓ Get the Android app

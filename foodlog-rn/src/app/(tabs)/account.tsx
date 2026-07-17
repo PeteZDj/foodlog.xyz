@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
 import { Alert, Linking, Pressable, ScrollView, View } from 'react-native';
@@ -13,7 +14,8 @@ const APK_URL = 'https://foodlog.xyz/downloads/foodlog-android.apk';
 
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
-  const { user, logout, goals, profile, loggedDayKeys, getDay, customFoods } = useFoodlog();
+  const { user, logout, goals, profile, loggedDayKeys, getDay, customFoods, syncing } = useFoodlog();
+  const avatar = profile.photo || user?.avatar;
 
   const keys = loggedDayKeys();
   const avg = keys.length
@@ -34,10 +36,14 @@ export default function AccountScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
         {/* Header */}
         <View style={{ backgroundColor: C.ink, paddingTop: insets.top + 20, paddingBottom: 26, paddingHorizontal: 20, alignItems: 'center' }}>
-          <View style={{ width: 76, height: 76, borderRadius: 38, backgroundColor: '#FFFFFF16', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-            <Txt f={font.black} size={28} color={C.white}>
-              {initials(user?.name)}
-            </Txt>
+          <View style={{ width: 76, height: 76, borderRadius: 38, backgroundColor: '#FFFFFF16', alignItems: 'center', justifyContent: 'center', marginBottom: 10, overflow: 'hidden' }}>
+            {avatar ? (
+              <Image source={{ uri: avatar }} style={{ width: 76, height: 76 }} contentFit="cover" />
+            ) : (
+              <Txt f={font.black} size={28} color={C.white}>
+                {initials(user?.name)}
+              </Txt>
+            )}
           </View>
           <Txt f={font.black} size={20} color={C.white}>
             {user?.name || 'My foodlog'}
@@ -79,7 +85,7 @@ export default function AccountScreen() {
             <LinkRow icon="download-outline" label="Get the Android app" onPress={() => Linking.openURL(APK_URL)} last />
           </View>
 
-          <SectionCard title="Account" rows={[['Signed in as', user?.email || 'Local'], ['Storage', 'On this device']]} />
+          <SectionCard title="Account" rows={[['Signed in as', user?.email || '—'], ['Sync', syncing ? 'Saving…' : 'Synced to your account']]} />
 
           <Pressable
             onPress={() =>
@@ -95,7 +101,7 @@ export default function AccountScreen() {
           </Pressable>
 
           <Txt f={font.mono} size={11} color={C.muted2} align="center" style={{ marginTop: 4 }}>
-            Foodlog v1.0 · Daily nutrition, clearly.
+            Foodlog v1.2 · Daily nutrition, clearly.
           </Txt>
         </View>
       </ScrollView>

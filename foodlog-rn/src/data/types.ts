@@ -32,6 +32,7 @@ export interface Food {
 /** A logged food. Nutrition fields are PER SINGLE SERVING; multiply by servings. */
 export interface FoodItem {
   id: string; // local uid for edit/remove
+  entryId?: string; // mirrors `id`; the web client keys/edits items by entryId
   name: string;
   serving: string;
   meal: MealName;
@@ -45,6 +46,10 @@ export interface FoodItem {
   sugar?: number;
   sodium?: number;
   satFat?: number;
+  photo?: string; // base64 data URL — synced to and shown on the website
+  emoji?: string; // single emoji for AI-described / manual foods
+  source?: string; // e.g. "AI photo scan", "Described", "Manual"
+  note?: string;
   loggedAt?: string; // ISO time
 }
 
@@ -65,6 +70,9 @@ export interface Goals {
 export interface Profile {
   displayName?: string;
   email?: string;
+  photo?: string; // avatar (base64 or URL) — matches the website's profile.photo
+  age?: number;
+  gender?: string; // 'Female' | 'Male' | 'Other' | 'Prefer not to say'
   favoriteFood?: string;
   location?: string;
   foodPhilosophy?: string;
@@ -101,6 +109,7 @@ export interface FoodlogState {
   exercises: ExerciseEntry[];
   customFoods: Food[];
   recentFoodIds: string[];
+  onboarded?: boolean; // false until the new-user profile form is completed
 }
 
 export interface DayTotals {

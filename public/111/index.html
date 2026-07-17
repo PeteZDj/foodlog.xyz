@@ -106,6 +106,19 @@
   .what{color:var(--sub);font-size:12.5px;margin:7px 0 0}
   .answer{margin-top:10px;font-size:13.5px;background:var(--tint);border-left:3px solid var(--primary);border-radius:0 11px 11px 0;padding:10px 13px}
   .answer .lab{display:block;font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--primary);margin-bottom:3px}
+  .prompt{margin-top:10px;border:1px dashed color-mix(in srgb,var(--accent) 50%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--accent) 6%,var(--card));overflow:hidden}
+  .prompt>summary{cursor:pointer;list-style:none;padding:9px 12px;font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:7px;user-select:none}
+  .prompt>summary::-webkit-details-marker{display:none}
+  .prompt>summary::before{content:"\26A1";font-size:12px}
+  .prompt>summary .chev{margin-left:auto;font-weight:700;transition:transform .15s}
+  .prompt[open]>summary .chev{transform:rotate(90deg)}
+  .prompt[open]>summary{border-bottom:1px solid var(--line)}
+  .promptbody{padding:11px 13px}
+  .prompthead{display:flex;justify-content:flex-end;margin-bottom:8px}
+  .promptbody pre{margin:0;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:anywhere;font-family:ui-monospace,"JetBrains Mono","SFMono-Regular",monospace;font-size:12px;line-height:1.55;color:var(--ink)}
+  .promptbody .copy{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--body);transition:.15s}
+  .promptbody .copy:hover{border-color:var(--accent);color:var(--accent)}
+  .promptbody .copy.ok{color:var(--done);border-color:var(--done)}
   footer{border-top:1px solid var(--line);margin-top:48px;padding:28px 0 64px;color:var(--sub);font-size:12.5px}
   footer .fbrand{display:flex;align-items:center;gap:10px;margin-bottom:10px}
   footer .fbrand img{width:26px;height:26px;border-radius:8px}
@@ -254,7 +267,7 @@
       if (curFilter==="todo" && ans.status!=="todo") return;
       if (curFilter==="doing" && ans.status!=="doing") return;
       if (curFilter && curFilter.charAt(0)==="p" && /^p\d+$/.test(curFilter)){ if(t.phase!==Number(curFilter.slice(1))) return; }
-      if (curSearch){ var hay=(t.name+" "+t.what+" "+(ans.text||"")).toLowerCase(); if(hay.indexOf(curSearch)<0) return; }
+      if (curSearch){ var hay=(t.name+" "+t.what+" "+(t.prompt||"")+" "+(ans.text||"")).toLowerCase(); if(hay.indexOf(curSearch)<0) return; }
       shown++;
       if (t.phase!==lastPhase){
         lastPhase=t.phase;
@@ -275,6 +288,7 @@
           '<div class="t-top"><span class="num">#'+t.n+'</span><span class="t-name">'+esc(t.name)+'</span><span class="pill '+pillClass+'">'+pillText+'</span></div>'+
           '<div class="what">'+esc(t.what)+'</div>'+
           (ans.text?('<div class="answer"><span class="lab">'+esc(S.name||"Our")+' \u2014 our answer</span>'+esc(ans.text)+'</div>'):'')+
+          (t.prompt?('<details class="prompt"><summary><span>AI prompt to do this task</span><span class="chev">\u203A</span></summary><div class="promptbody"><div class="prompthead"><button class="copy" type="button">Copy prompt</button></div><pre>'+esc(t.prompt)+'</pre></div></details>'):'')+
         '</div>';
       listEl.appendChild(el);
     });
@@ -304,6 +318,19 @@
     persist(); updateProgress();
   });
 
+  function fallbackCopy(txt){
+    try{ var ta=document.createElement("textarea"); ta.value=txt; ta.setAttribute("readonly",""); ta.style.position="fixed"; ta.style.top="-9999px"; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); }catch(e){}
+  }
+  listEl.addEventListener("click", function(e){
+    var b=e.target.closest(".copy"); if(!b) return;
+    e.preventDefault();
+    var det=b.closest("details"); var pre=det?det.querySelector("pre"):null; if(!pre) return;
+    var txt=pre.textContent;
+    function ok(){ var o=b.getAttribute("data-label")||b.textContent; b.setAttribute("data-label",o); b.textContent="Copied!"; b.classList.add("ok"); setTimeout(function(){ b.textContent=o; b.classList.remove("ok"); },1500); }
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(ok,function(){ fallbackCopy(txt); ok(); }); }
+    else { fallbackCopy(txt); ok(); }
+  });
+
   document.addEventListener("click", function(e){
     var c=e.target.closest(".chip"); if(!c) return;
     document.querySelectorAll(".chip").forEach(function(x){x.classList.remove("active")}); c.classList.add("active");
@@ -327,6 +354,7 @@
       md+="- ["+(a.status==="done"?"x":" ")+"] **#"+t.n+" \u00b7 "+t.name+"** \u2014 "+statusMd(a.status)+"\n";
       md+="  - *Task:* "+t.what+"\n";
       md+="  - *"+(S.name||"Us")+":* "+(a.text||"")+"\n";
+      if(t.prompt){ md+="  - *AI prompt:*\n\n    "+t.prompt.split("\n").join("\n    ")+"\n"; }
     });
     md+="\n---\n\n_Answers are "+(S.name||"")+"'s own assessment and recommendations. Framework: The 111 Playbook (111.pete.ke)._\n";
     return md;

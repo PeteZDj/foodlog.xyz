@@ -2,7 +2,7 @@
   "expo": {
     "name": "Foodlog",
     "slug": "foodlog-rn",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "foodlog",
@@ -34,7 +34,14 @@
           "imageWidth": 150
         }
       ],
-      "expo-image"
+      "expo-image",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Foodlog uses your photos so you can log meals from pictures.",
+          "cameraPermission": "Foodlog uses the camera to scan and log your meals."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false,

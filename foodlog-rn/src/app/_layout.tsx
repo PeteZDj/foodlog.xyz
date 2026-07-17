@@ -48,6 +48,7 @@ export default function RootLayout() {
             <Stack.Screen name="weight" />
             <Stack.Screen name="day/[key]" />
             <Stack.Screen name="login" />
+            <Stack.Screen name="onboarding" />
           </Stack>
         </FoodlogProvider>
       </SafeAreaProvider>
