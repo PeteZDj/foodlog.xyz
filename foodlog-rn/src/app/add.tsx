@@ -1,18 +1,19 @@
 // Add-food flow — a Fastic-style sheet in Foodlog colors with four ways in:
 //   Search   → the food database (built-in + OpenFoodFacts)
-//   Scan     → take / upload a photo → Gemini vision (/api/scan)
-//   Describe → free-text "what did you eat?" → Gemini (/api/parse)
-//   Manual   → type the macros yourself
+//   Scan     → take / upload a photo → Gemini vision (/api/scan) → nutrition label
+//   Voice    → speak your meal (keyboard dictation) → Gemini (/api/parse)
+//   Manual   → snap/upload + auto-fill the facts, or type the macros yourself
 // Scanned / described items are logged with their photo (base64) or emoji so
 // they sync to the account and show up on the website too.
 
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AddFoodSheet } from '@/components/AddFoodSheet';
 import { FoodRow } from '@/app/(tabs)/foods';
@@ -21,19 +22,37 @@ import { searchLocal } from '@/data/foods';
 import { searchOpenFoodFacts } from '@/data/off';
 import { Food, FoodItem, MealName } from '@/data/types';
 import { useFoodlog } from '@/store';
-import { C, font, MEALS, radius } from '@/theme';
+import { C, font, MEAL_ICON, MEALS, radius } from '@/theme';
 import { num, todayKey, uid } from '@/util';
 import { Txt } from '@/ui';
 
-type Tab = 'search' | 'scan' | 'describe' | 'manual';
+type Tab = 'search' | 'scan' | 'voice' | 'manual';
 type Staged = ScanItem & { _qty: number; _on: boolean; emoji?: string };
 
-const TABS: { key: Tab; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { key: 'search', label: 'Search', icon: 'search' },
-  { key: 'scan', label: 'Scan', icon: 'camera' },
-  { key: 'describe', label: 'Describe', icon: 'sparkles' },
-  { key: 'manual', label: 'Manual', icon: 'create-outline' },
+const TABS: { key: Tab; label: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
+  { key: 'search', label: 'Search', icon: 'search', color: C.ink },
+  { key: 'scan', label: 'Scan', icon: 'camera', color: C.brand },
+  { key: 'voice', label: 'Voice', icon: 'mic', color: C.water },
+  { key: 'manual', label: 'Manual', icon: 'keypad', color: '#E7A33E' },
 ];
+
+/* A 0–100 health score from the macros of a food (higher = better). */
+function nutritionScore(m: { calories: number; protein: number; carbs: number; fat: number; fiber?: number; sugar?: number; satFat?: number }): number {
+  let s = 55;
+  s += Math.min(24, (m.protein || 0) * 0.6); // protein is good
+  s += Math.min(14, (m.fiber || 0) * 2); // fiber is good
+  s -= Math.min(22, (m.satFat || 0) * 1.6); // saturated fat is bad
+  s -= Math.min(22, (m.sugar || 0) * 0.5); // sugar is bad
+  if ((m.calories || 0) > 600) s -= Math.min(18, (m.calories - 600) * 0.02); // very calorie-dense
+  return Math.max(5, Math.min(98, Math.round(s)));
+}
+function scoreLabel(s: number): string {
+  if (s >= 80) return 'Excellent';
+  if (s >= 65) return 'Good';
+  if (s >= 45) return 'Fair';
+  if (s >= 25) return 'Heavy';
+  return 'Treat';
+}
 
 export default function AddScreen() {
   const insets = useSafeAreaInsets();
@@ -41,7 +60,10 @@ export default function AddScreen() {
   const date = params.date || todayKey();
   const [meal, setMeal] = useState<MealName>((params.meal as MealName) || 'Breakfast');
   const [tab, setTab] = useState<Tab>((params.tab as Tab) || 'search');
-  const { token, addItem } = useFoodlog();
+  const [mealOpen, setMealOpen] = useState(false);
+  const { token, addItem, getDay } = useFoodlog();
+
+  const dayCount = getDay(date).items.filter((it) => it.meal === meal).length;
 
   const logItems = (items: Staged[], photo?: string, source?: string) => {
     items
@@ -74,46 +96,52 @@ export default function AddScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       {/* Header */}
-      <View style={{ backgroundColor: C.ink, paddingTop: insets.top + 8, paddingHorizontal: 14, paddingBottom: 12 }}>
+      <View style={{ backgroundColor: C.ink, paddingTop: insets.top + 8, paddingHorizontal: 14, paddingBottom: 16 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Pressable onPress={() => router.back()} hitSlop={10} style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: '#FFFFFF14', alignItems: 'center', justifyContent: 'center' }}>
             <Ionicons name="close" size={20} color={C.white} />
           </Pressable>
-          <Txt f={font.bold} size={17} color={C.white} style={{ flex: 1, textAlign: 'center' }}>
-            Add food
-          </Txt>
-          <View style={{ width: 38 }} />
-        </View>
 
-        {/* Meal selector */}
-        <View style={{ flexDirection: 'row', gap: 7, marginTop: 12 }}>
-          {MEALS.map((m) => {
-            const active = m === meal;
-            return (
-              <Pressable
-                key={m}
-                onPress={() => setMeal(m)}
-                style={{ flex: 1, paddingVertical: 8, borderRadius: radius.pill, alignItems: 'center', backgroundColor: active ? C.white : '#FFFFFF12' }}>
-                <Txt f={font.bodySemi} size={12} color={active ? C.ink : '#CFCFCB'}>
-                  {m}
-                </Txt>
-              </Pressable>
-            );
-          })}
+          <Pressable
+            onPress={() => setMealOpen(true)}
+            style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <Txt f={font.bold} size={17} color={C.white}>
+              {meal}
+            </Txt>
+            <Ionicons name="chevron-down" size={16} color="#CFCFCB" />
+          </Pressable>
+
+          <View style={{ minWidth: 38, height: 38, borderRadius: 19, backgroundColor: '#FFFFFF14', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 }}>
+            <Txt f={font.monoBold} size={14} color={C.white}>
+              {dayCount}
+            </Txt>
+          </View>
         </View>
       </View>
 
-      {/* Tabs */}
-      <View style={{ flexDirection: 'row', backgroundColor: C.card, borderBottomWidth: 1, borderBottomColor: C.line, paddingHorizontal: 8 }}>
+      {/* Colored tab chips */}
+      <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingTop: 12, paddingBottom: 6, backgroundColor: C.bg }}>
         {TABS.map((t) => {
           const active = t.key === tab;
           return (
-            <Pressable key={t.key} onPress={() => setTab(t.key)} style={{ flex: 1, alignItems: 'center', paddingVertical: 12, gap: 3 }}>
-              <Ionicons name={t.icon} size={20} color={active ? C.brand : C.muted2} />
-              <Txt f={active ? font.bodyBold : font.bodyMed} size={11.5} color={active ? C.brand : C.muted}>
+            <Pressable
+              key={t.key}
+              onPress={() => setTab(t.key)}
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 5,
+                paddingVertical: 11,
+                borderRadius: radius.lg,
+                backgroundColor: active ? t.color : t.color + '18',
+                borderWidth: active ? 0 : 1,
+                borderColor: t.color + '2A',
+              }}>
+              <Ionicons name={t.icon} size={19} color={active ? C.white : t.color} />
+              <Txt f={active ? font.bodyBold : font.bodySemi} size={11.5} color={active ? C.white : t.color}>
                 {t.label}
               </Txt>
-              <View style={{ height: 2, width: 26, borderRadius: 1, backgroundColor: active ? C.brand : 'transparent', marginTop: 2 }} />
             </Pressable>
           );
         })}
@@ -121,8 +149,31 @@ export default function AddScreen() {
 
       {tab === 'search' && <SearchTab date={date} meal={meal} />}
       {tab === 'scan' && <ScanTab token={token} onLog={logItems} />}
-      {tab === 'describe' && <DescribeTab token={token} onLog={logItems} />}
-      {tab === 'manual' && <ManualTab onLog={logItems} />}
+      {tab === 'voice' && <VoiceTab token={token} onLog={logItems} />}
+      {tab === 'manual' && <ManualTab token={token} onLog={logItems} />}
+
+      {/* Meal dropdown */}
+      <Modal visible={mealOpen} transparent animationType="fade" onRequestClose={() => setMealOpen(false)}>
+        <Pressable style={{ flex: 1, backgroundColor: '#00000055' }} onPress={() => setMealOpen(false)}>
+          <View style={{ position: 'absolute', top: insets.top + 54, alignSelf: 'center', width: 240, backgroundColor: C.card, borderRadius: radius.lg, paddingVertical: 6, borderWidth: 1, borderColor: C.line }}>
+            {MEALS.map((m) => {
+              const active = m === meal;
+              return (
+                <Pressable
+                  key={m}
+                  onPress={() => { setMeal(m); setMealOpen(false); }}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16 }}>
+                  <Ionicons name={(MEAL_ICON[m] as any) || 'restaurant-outline'} size={18} color={active ? C.brand : C.muted} />
+                  <Txt f={active ? font.bodyBold : font.bodyMed} size={15} color={active ? C.ink : C.textSub} style={{ flex: 1 }}>
+                    {m}
+                  </Txt>
+                  {active && <Ionicons name="checkmark" size={18} color={C.brand} />}
+                </Pressable>
+              );
+            })}
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -294,7 +345,18 @@ function ScanTab({ token, onLog }: { token: string | null; onLog: (items: Staged
     }
   };
 
-  const selectedCount = items.filter((i) => i._on).length;
+  const on = items.filter((i) => i._on);
+  const selectedCount = on.length;
+  const totals = on.reduce(
+    (t, it) => ({
+      calories: t.calories + it.calories * it._qty,
+      protein: t.protein + it.protein * it._qty,
+      carbs: t.carbs + it.carbs * it._qty,
+      fat: t.fat + it.fat * it._qty,
+      fiber: t.fiber + (it.fiber || 0) * it._qty,
+    }),
+    { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+  );
 
   return (
     <View style={{ flex: 1 }}>
@@ -335,12 +397,16 @@ function ScanTab({ token, onLog }: { token: string | null; onLog: (items: Staged
 
         {items.length > 0 && (
           <>
-            {!!summary && (
-              <Txt f={font.body} size={13} color={C.muted} style={{ marginTop: 18, marginBottom: 4 }}>
-                {summary}
-              </Txt>
-            )}
-            <Txt f={font.mono} size={11} color={C.muted} style={{ letterSpacing: 1.2, marginTop: 12, marginBottom: 8 }}>
+            {/* Nutrition facts label for the detected plate */}
+            <NutritionLabel
+              title={summary || 'Scanned meal'}
+              calories={totals.calories}
+              protein={totals.protein}
+              carbs={totals.carbs}
+              fat={totals.fat}
+              fiber={totals.fiber}
+            />
+            <Txt f={font.mono} size={11} color={C.muted} style={{ letterSpacing: 1.2, marginTop: 16, marginBottom: 8 }}>
               DETECTED FOODS — TAP TO ADJUST
             </Txt>
             {items.map((it, i) => (
@@ -353,7 +419,7 @@ function ScanTab({ token, onLog }: { token: string | null; onLog: (items: Staged
       {selectedCount > 0 && (
         <LogBar
           label={`Add ${selectedCount} item${selectedCount === 1 ? '' : 's'}`}
-          kcal={items.filter((i) => i._on).reduce((s, it) => s + it.calories * it._qty, 0)}
+          kcal={totals.calories}
           onPress={() => onLog(items, photo || undefined, 'AI photo scan')}
         />
       )}
@@ -361,14 +427,15 @@ function ScanTab({ token, onLog }: { token: string | null; onLog: (items: Staged
   );
 }
 
-/* ────────────────────────────── Describe ────────────────────────────── */
+/* ─────────────────────────────── Voice ──────────────────────────────── */
 
-function DescribeTab({ token, onLog }: { token: string | null; onLog: (items: Staged[], photo?: string, source?: string) => void }) {
+function VoiceTab({ token, onLog }: { token: string | null; onLog: (items: Staged[], photo?: string, source?: string) => void }) {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<Staged[]>([]);
   const [summary, setSummary] = useState('');
   const [error, setError] = useState('');
+  const inputRef = useRef<TextInput>(null);
 
   const run = async () => {
     setError('');
@@ -397,19 +464,28 @@ function DescribeTab({ token, onLog }: { token: string | null; onLog: (items: St
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        <Txt f={font.black} size={19} color={C.ink} style={{ letterSpacing: -0.3 }}>
-          What did you eat? 😋
-        </Txt>
-        <Txt f={font.body} size={13} color={C.muted} style={{ marginTop: 4, marginBottom: 12 }}>
-          Describe your meal in plain words — we'll break down every item and its nutrition.
-        </Txt>
+        <View style={{ alignItems: 'center', marginTop: 6, marginBottom: 8 }}>
+          <Pressable
+            onPress={() => inputRef.current?.focus()}
+            style={({ pressed }) => ({ width: 92, height: 92, borderRadius: 46, backgroundColor: C.water, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.9 : 1, shadowColor: C.water, shadowOpacity: 0.3, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 6 })}>
+            <Ionicons name="mic" size={40} color={C.white} />
+          </Pressable>
+          <Txt f={font.black} size={19} color={C.ink} style={{ marginTop: 16, letterSpacing: -0.3 }}>
+            What did you eat? 😋
+          </Txt>
+          <Txt f={font.body} size={13} color={C.muted} style={{ marginTop: 4, textAlign: 'center', maxWidth: 300 }}>
+            Tap the mic, then tap the microphone on your keyboard to speak — or just type it. We'll break down every item and its nutrition.
+          </Txt>
+        </View>
+
         <TextInput
+          ref={inputRef}
           value={text}
           onChangeText={setText}
           multiline
           placeholder="e.g. 2 chapatis, a cup of beans stew, 1 boiled egg and a mug of chai"
           placeholderTextColor={C.muted2}
-          style={{ minHeight: 110, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: radius.lg, padding: 14, color: C.ink, fontFamily: font.body, fontSize: 15.5, textAlignVertical: 'top' }}
+          style={{ marginTop: 8, minHeight: 96, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: radius.lg, padding: 14, color: C.ink, fontFamily: font.body, fontSize: 15.5, textAlignVertical: 'top' }}
         />
         <Pressable
           onPress={run}
@@ -457,7 +533,7 @@ function DescribeTab({ token, onLog }: { token: string | null; onLog: (items: St
         <LogBar
           label={`Add ${selectedCount} item${selectedCount === 1 ? '' : 's'}`}
           kcal={items.filter((i) => i._on).reduce((s, it) => s + it.calories * it._qty, 0)}
-          onPress={() => onLog(items, undefined, 'Described')}
+          onPress={() => onLog(items, undefined, 'Voice')}
         />
       )}
     </KeyboardAvoidingView>
@@ -466,14 +542,67 @@ function DescribeTab({ token, onLog }: { token: string | null; onLog: (items: St
 
 /* ─────────────────────────────── Manual ─────────────────────────────── */
 
-function ManualTab({ onLog }: { onLog: (items: Staged[], photo?: string, source?: string) => void }) {
+function ManualTab({ token, onLog }: { token: string | null; onLog: (items: Staged[], photo?: string, source?: string) => void }) {
   const [name, setName] = useState('');
   const [portion, setPortion] = useState('');
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [fiber, setFiber] = useState('');
+  const [sugar, setSugar] = useState('');
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [autoFilling, setAutoFilling] = useState(false);
   const [error, setError] = useState('');
+  const [autoNote, setAutoNote] = useState('');
+
+  const score = nutritionScore({
+    calories: Number(calories) || 0,
+    protein: Number(protein) || 0,
+    carbs: Number(carbs) || 0,
+    fat: Number(fat) || 0,
+    fiber: Number(fiber) || 0,
+    sugar: Number(sugar) || 0,
+  });
+
+  const autoFill = async (fromCamera: boolean) => {
+    setError('');
+    setAutoNote('');
+    const data = await pickImage(fromCamera);
+    if (!data) return;
+    setPhoto(data);
+    if (!token) return setError('Please sign in again to auto-fill from a photo.');
+    setAutoFilling(true);
+    try {
+      const res = await api.scan(token, data);
+      const list = res.items || [];
+      if (!list.length) {
+        setAutoNote(res.summary || 'No food detected — enter the facts manually below.');
+      } else {
+        const t = list.reduce(
+          (a, it) => ({
+            calories: a.calories + (it.calories || 0),
+            protein: a.protein + (it.protein || 0),
+            carbs: a.carbs + (it.carbs || 0),
+            fat: a.fat + (it.fat || 0),
+            fiber: a.fiber + (it.fiber || 0),
+          }),
+          { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
+        );
+        if (!name.trim()) setName(list.length === 1 ? list[0].name : res.summary || `${list.length} items`);
+        setCalories(String(Math.round(t.calories)));
+        setProtein(String(Math.round(t.protein)));
+        setCarbs(String(Math.round(t.carbs)));
+        setFat(String(Math.round(t.fat)));
+        setFiber(String(Math.round(t.fiber)));
+        setAutoNote(res.summary || 'Nutritional facts filled in from your photo — tweak anything below.');
+      }
+    } catch (e: any) {
+      setError(e?.message || 'Could not read that photo. Enter the facts manually.');
+    } finally {
+      setAutoFilling(false);
+    }
+  };
 
   const save = () => {
     setError('');
@@ -487,17 +616,63 @@ function ManualTab({ onLog }: { onLog: (items: Staged[], photo?: string, source?
       protein: Number(protein) || 0,
       carbs: Number(carbs) || 0,
       fat: Number(fat) || 0,
-      fiber: 0,
+      fiber: Number(fiber) || 0,
       _qty: 1,
       _on: true,
     };
-    onLog([item], undefined, 'Manual');
+    onLog([item], photo || undefined, 'Manual');
   };
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        <ManualField label="What did you eat?" value={name} onChangeText={setName} placeholder="e.g. Grandma's beef pilau" autoCapitalize="sentences" />
+        {/* Photo + auto-fill */}
+        <Pressable
+          onPress={() => autoFill(false)}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.line, borderStyle: photo ? 'solid' : 'dashed', borderRadius: radius.lg, padding: 12 }}>
+          {photo ? (
+            <Image source={{ uri: photo }} style={{ width: 64, height: 64, borderRadius: radius.md, backgroundColor: C.bgElevated }} contentFit="cover" />
+          ) : (
+            <View style={{ width: 64, height: 64, borderRadius: radius.md, backgroundColor: C.bgElevated, alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name="image-outline" size={26} color={C.muted2} />
+            </View>
+          )}
+          <Txt f={font.bodyMed} size={15} color={C.textSub} style={{ flex: 1 }}>
+            What did you eat? 😋
+          </Txt>
+        </Pressable>
+
+        <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+          <BigButton icon="camera" label="Snap photo" onPress={() => autoFill(true)} solid />
+          <BigButton icon="sparkles" label="Auto-fill facts" onPress={() => autoFill(false)} />
+        </View>
+
+        {autoFilling && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14, justifyContent: 'center' }}>
+            <ActivityIndicator color={C.brand} />
+            <Txt f={font.bodyMed} size={13.5} color={C.textSub}>
+              Reading the nutritional facts…
+            </Txt>
+          </View>
+        )}
+        {!!autoNote && !autoFilling && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, backgroundColor: C.brandTint, borderRadius: radius.md, padding: 11 }}>
+            <Ionicons name="sparkles" size={15} color={C.brandDark} />
+            <Txt f={font.bodyMed} size={12.5} color={C.brandDark} style={{ flex: 1 }}>
+              {autoNote}
+            </Txt>
+          </View>
+        )}
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 18, marginBottom: 6 }}>
+          <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+          <Txt f={font.body} size={12} color={C.muted}>
+            or edit manually
+          </Txt>
+          <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+        </View>
+
+        <ManualField label="Food name" value={name} onChangeText={setName} placeholder="e.g. Grandma's beef pilau" autoCapitalize="sentences" />
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <ManualField label="Portion size" value={portion} onChangeText={setPortion} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} />
           <ManualField label="Calories" value={calories} onChangeText={setCalories} placeholder="0" keyboardType="number-pad" suffix="kcal" style={{ flex: 1 }} />
@@ -506,10 +681,17 @@ function ManualTab({ onLog }: { onLog: (items: Staged[], photo?: string, source?
           MACRONUTRIENTS
         </Txt>
         <View style={{ flexDirection: 'row', gap: 10 }}>
+          <ManualField label="Fat" value={fat} onChangeText={setFat} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
           <ManualField label="Protein" value={protein} onChangeText={setProtein} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
           <ManualField label="Carbs" value={carbs} onChangeText={setCarbs} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
-          <ManualField label="Fat" value={fat} onChangeText={setFat} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
         </View>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <ManualField label="Fiber" value={fiber} onChangeText={setFiber} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
+          <ManualField label="Sugar" value={sugar} onChangeText={setSugar} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
+        </View>
+
+        {/* Nutrition score */}
+        <NutritionScoreBar score={score} />
 
         {!!error && (
           <Txt f={font.bodyMed} size={13} color={C.danger} style={{ marginTop: 14 }}>
@@ -524,6 +706,83 @@ function ManualTab({ onLog }: { onLog: (items: Staged[], photo?: string, source?
 }
 
 /* ─────────────────────────── shared building blocks ─────────────────── */
+
+function NutritionScoreBar({ score }: { score: number }) {
+  return (
+    <View style={{ marginTop: 20 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <Txt f={font.bodyBold} size={14} color={C.ink}>
+          Nutrition Score
+        </Txt>
+        <Txt f={font.monoBold} size={13} color={C.textSub}>
+          {score} · {scoreLabel(score)}
+        </Txt>
+      </View>
+      <View style={{ height: 12, borderRadius: 999, overflow: 'hidden' }}>
+        <LinearGradient
+          colors={['#D64545', '#E7A33E', '#8FBE4B', '#2E9E5B']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{ flex: 1, borderRadius: 999 }}
+        />
+      </View>
+      <View style={{ height: 0 }}>
+        <View
+          style={{
+            position: 'absolute',
+            top: -18,
+            left: `${score}%`,
+            marginLeft: -11,
+            width: 22,
+            height: 22,
+            borderRadius: 11,
+            backgroundColor: C.white,
+            borderWidth: 3,
+            borderColor: C.ink,
+          }}
+        />
+      </View>
+    </View>
+  );
+}
+
+function NutritionLabel({ title, calories, protein, carbs, fat, fiber }: { title: string; calories: number; protein: number; carbs: number; fat: number; fiber: number }) {
+  const score = nutritionScore({ calories, protein, carbs, fat, fiber });
+  const Row = ({ label, value, unit, bold, indent }: { label: string; value: number; unit: string; bold?: boolean; indent?: boolean }) => (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6, borderTopWidth: bold ? 0 : 1, borderTopColor: C.line2, paddingLeft: indent ? 14 : 0 }}>
+      <Txt f={bold ? font.bodyBold : font.bodyMed} size={bold ? 14.5 : 13} color={bold ? C.ink : C.textSub}>
+        {label}
+      </Txt>
+      <Txt f={bold ? font.monoBold : font.mono} size={bold ? 14.5 : 13} color={C.ink}>
+        {num(Math.round(value))}{unit}
+      </Txt>
+    </View>
+  );
+  return (
+    <View style={{ marginTop: 16, backgroundColor: C.card, borderRadius: radius.lg, borderWidth: 1, borderColor: C.line, padding: 16 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Txt f={font.mono} size={11} color={C.muted} style={{ letterSpacing: 1.4 }}>
+          NUTRITION FACTS
+        </Txt>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.brandTint, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 4 }}>
+          <Ionicons name="leaf" size={12} color={C.brandDark} />
+          <Txt f={font.bodyBold} size={11.5} color={C.brandDark}>
+            {score} · {scoreLabel(score)}
+          </Txt>
+        </View>
+      </View>
+      <Txt f={font.bodyBold} size={15} color={C.ink} numberOfLines={2} style={{ marginTop: 6 }}>
+        {title}
+      </Txt>
+      <View style={{ height: 2, backgroundColor: C.ink, marginTop: 10, marginBottom: 2 }} />
+      <Row label="Calories" value={calories} unit=" kcal" bold />
+      <Row label="Protein" value={protein} unit="g" />
+      <Row label="Carbs" value={carbs} unit="g" />
+      <Row label="Fiber" value={fiber} unit="g" indent />
+      <Row label="Fat" value={fat} unit="g" />
+    </View>
+  );
+}
 
 function ResultCard({ item, onChange }: { item: Staged; onChange: (next: Staged) => void }) {
   const step = (d: number) => onChange({ ...item, _qty: Math.max(0.5, Math.round((item._qty + d) * 2) / 2) });
@@ -578,14 +837,14 @@ function LogBar({ label, kcal, onPress }: { label: string; kcal: number; onPress
     <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 14, paddingBottom: insets.bottom + 12, backgroundColor: C.bg, borderTopWidth: 1, borderTopColor: C.line }}>
       <Pressable
         onPress={onPress}
-        style={({ pressed }) => ({ height: 54, borderRadius: radius.md, backgroundColor: C.ink, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: pressed ? 0.9 : 1 })}>
+        style={({ pressed }) => ({ height: 54, borderRadius: radius.md, backgroundColor: C.brand, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: pressed ? 0.9 : 1 })}>
         <Ionicons name="add-circle" size={20} color={C.white} />
         <Txt f={font.bold} size={16} color={C.white}>
           {label}
         </Txt>
         {kcal > 0 && (
-          <Txt f={font.body} size={13} color="#B9B9B4">
-            · {num(kcal)} kcal
+          <Txt f={font.body} size={13} color="#EAF6EE">
+            · {num(Math.round(kcal))} kcal
           </Txt>
         )}
       </Pressable>

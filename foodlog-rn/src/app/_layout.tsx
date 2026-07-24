@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { FoodlogProvider } from '@/store';
+import { UpdateGate } from '@/components/UpdateGate';
 import { C } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -39,6 +40,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <FoodlogProvider>
           <StatusBar style="light" />
+          <UpdateGate />
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="add" options={{ presentation: 'modal' }} />
