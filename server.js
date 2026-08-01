@@ -50,6 +50,17 @@ async function initDb() {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+  await q(`
+    CREATE TABLE IF NOT EXISTS oauth_codes (
+      code         TEXT PRIMARY KEY,
+      user_id      TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      client_id    TEXT NOT NULL,
+      redirect_uri TEXT NOT NULL,
+      expires_at   TIMESTAMPTZ NOT NULL,
+      used_at      TIMESTAMPTZ,
+      created_at   TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
   console.log('DB ready');
 }
 
@@ -177,6 +188,71 @@ app.post('/api/auth/logout', wrap(async (req, res) => {
   const token = auth.replace('Bearer ', '').trim();
   if (token) await q('DELETE FROM sessions WHERE token = $1', [token]);
   res.json({ ok: true });
+}));
+
+// ── PersonalOS OAuth-style partner integration ─────────────────────────
+const OAUTH_CLIENTS = {
+  personalos: {
+    name: 'PersonalOS',
+    allowedRedirects: [
+      'https://personaios.com/meals',
+      'http://localhost:3000/meals',
+      'http://127.0.0.1:3000/meals',
+    ],
+  },
+};
+
+function isAllowedRedirect(clientId, redirectUri) {
+  const client = OAUTH_CLIENTS[clientId];
+  if (!client) return false;
+  return client.allowedRedirects.some(allowed => redirectUri === allowed || redirectUri.startsWith(allowed + '?'));
+}
+
+// POST /api/oauth/authorize — Foodlog user (Bearer) grants PersonalOS a one-time code
+app.post('/api/oauth/authorize', wrap(async (req, res) => {
+  const user = await getSessionUser(req);
+  if (!user) return res.status(401).json({ error: 'Sign in to Foodlog first' });
+
+  const clientId = String(req.body?.client_id || '').trim();
+  const redirectUri = String(req.body?.redirect_uri || '').trim();
+  const state = String(req.body?.state || '');
+  if (!OAUTH_CLIENTS[clientId]) return res.status(400).json({ error: 'Unknown client' });
+  if (!redirectUri || !isAllowedRedirect(clientId, redirectUri)) {
+    return res.status(400).json({ error: 'Invalid redirect_uri' });
+  }
+
+  const code = crypto.randomBytes(24).toString('hex');
+  await q(
+    `INSERT INTO oauth_codes (code, user_id, client_id, redirect_uri, expires_at)
+     VALUES ($1, $2, $3, $4, NOW() + INTERVAL '10 minutes')`,
+    [code, user.id, clientId, redirectUri]
+  );
+  res.json({ code, state, expires_in: 600 });
+}));
+
+// POST /api/oauth/token — exchange one-time code for a Foodlog access token
+app.post('/api/oauth/token', wrap(async (req, res) => {
+  const code = String(req.body?.code || '').trim();
+  const clientId = String(req.body?.client_id || '').trim();
+  if (!code || !clientId) return res.status(400).json({ error: 'code and client_id required' });
+
+  const { rows } = await q(
+    `SELECT * FROM oauth_codes
+     WHERE code = $1 AND client_id = $2 AND used_at IS NULL AND expires_at > NOW()`,
+    [code, clientId]
+  );
+  const row = rows[0];
+  if (!row) return res.status(400).json({ error: 'Invalid or expired authorization code' });
+
+  await q(`UPDATE oauth_codes SET used_at = NOW() WHERE code = $1`, [code]);
+  const accessToken = await createSession(row.user_id);
+  const user = (await q('SELECT * FROM users WHERE id = $1', [row.user_id])).rows[0];
+  res.json({
+    access_token: accessToken,
+    token_type: 'Bearer',
+    expires_in: 30 * 24 * 3600,
+    user: publicUser(user),
+  });
 }));
 
 // GET /api/sync — load user's foodlog state
