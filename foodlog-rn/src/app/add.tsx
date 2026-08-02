@@ -21,19 +21,20 @@ import { api, ParseItem, ScanItem } from '@/data/api';
 import { searchLocal } from '@/data/foods';
 import { searchOpenFoodFacts } from '@/data/off';
 import { Food, FoodItem, MealName } from '@/data/types';
+import { mealForCurrentTime } from '@/data/merge';
 import { useFoodlog } from '@/store';
 import { C, font, MEAL_ICON, MEALS, radius } from '@/theme';
 import { num, todayKey, uid } from '@/util';
 import { Txt } from '@/ui';
 
-type Tab = 'search' | 'scan' | 'voice' | 'manual';
+type Tab = 'type' | 'search' | 'scan' | 'voice';
 type Staged = ScanItem & { _qty: number; _on: boolean; emoji?: string };
 
 const TABS: { key: Tab; label: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
+  { key: 'type', label: 'Type', icon: 'create-outline', color: '#E7A33E' },
   { key: 'search', label: 'Search', icon: 'search', color: C.ink },
   { key: 'scan', label: 'Scan', icon: 'camera', color: C.brand },
   { key: 'voice', label: 'Voice', icon: 'mic', color: C.water },
-  { key: 'manual', label: 'Manual', icon: 'keypad', color: '#E7A33E' },
 ];
 
 /* A 0–100 health score from the macros of a food (higher = better). */
@@ -58,8 +59,8 @@ export default function AddScreen() {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ date?: string; meal?: string; tab?: string }>();
   const date = params.date || todayKey();
-  const [meal, setMeal] = useState<MealName>((params.meal as MealName) || 'Breakfast');
-  const [tab, setTab] = useState<Tab>((params.tab as Tab) || 'search');
+  const [meal, setMeal] = useState<MealName>((params.meal as MealName) || mealForCurrentTime());
+  const [tab, setTab] = useState<Tab>((params.tab as Tab) || 'type');
   const [mealOpen, setMealOpen] = useState(false);
   const { token, addItem, getDay } = useFoodlog();
 
@@ -147,10 +148,10 @@ export default function AddScreen() {
         })}
       </View>
 
+      {tab === 'type' && <TypeTab token={token} onLog={logItems} onJump={(t) => setTab(t)} />}
       {tab === 'search' && <SearchTab date={date} meal={meal} />}
       {tab === 'scan' && <ScanTab token={token} onLog={logItems} />}
       {tab === 'voice' && <VoiceTab token={token} onLog={logItems} />}
-      {tab === 'manual' && <ManualTab token={token} onLog={logItems} />}
 
       {/* Meal dropdown */}
       <Modal visible={mealOpen} transparent animationType="fade" onRequestClose={() => setMealOpen(false)}>
@@ -175,6 +176,225 @@ export default function AddScreen() {
         </Pressable>
       </Modal>
     </View>
+  );
+}
+
+/* ─────────────────────────────── Type (default) ─────────────────────── */
+
+function TypeTab({
+  token,
+  onLog,
+  onJump,
+}: {
+  token: string | null;
+  onLog: (items: Staged[], photo?: string, source?: string) => void;
+  onJump: (tab: Tab) => void;
+}) {
+  const [text, setText] = useState('');
+  const [name, setName] = useState('');
+  const [calories, setCalories] = useState('');
+  const [protein, setProtein] = useState('');
+  const [carbs, setCarbs] = useState('');
+  const [fat, setFat] = useState('');
+  const [fiber, setFiber] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [items, setItems] = useState<Staged[]>([]);
+  const [summary, setSummary] = useState('');
+  const [error, setError] = useState('');
+  const inputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => inputRef.current?.focus(), 250);
+    return () => clearTimeout(t);
+  }, []);
+
+  const runDescribe = async () => {
+    setError('');
+    if (!text.trim()) return setError('Type what you ate — e.g. ugali, sukuma and nyama choma.');
+    if (!token) return setError('Please sign in again to use AI logging.');
+    setLoading(true);
+    setItems([]);
+    setSummary('');
+    try {
+      const res = await api.parse(token, text.trim());
+      if (!res.items?.length) {
+        setError(res.summary || 'Could not find foods in that. Try rephrasing.');
+      } else {
+        setItems(res.items.map((it: ParseItem) => ({ ...it, _qty: 1, _on: true, emoji: it.emoji })));
+        setSummary(res.summary || '');
+      }
+    } catch (e: any) {
+      setError(e?.message || 'Could not understand that. Try rephrasing.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveManual = () => {
+    setError('');
+    if (!name.trim() && !text.trim()) return setError('Give your food a name, or describe the meal above.');
+    if (!calories && !protein && !carbs && !fat) {
+      // If they typed a description but didn't analyze, nudge them.
+      if (text.trim() && !name.trim()) return runDescribe();
+      return setError('Enter at least the calories or a macro, or tap Analyze meal.');
+    }
+    const item: Staged = {
+      name: (name.trim() || text.trim()).slice(0, 80),
+      serving: '1 serving',
+      category: 'Meal',
+      calories: Number(calories) || 0,
+      protein: Number(protein) || 0,
+      carbs: Number(carbs) || 0,
+      fat: Number(fat) || 0,
+      fiber: Number(fiber) || 0,
+      _qty: 1,
+      _on: true,
+    };
+    onLog([item], undefined, 'Manual');
+  };
+
+  const selectedCount = items.filter((i) => i._on).length;
+
+  return (
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 140 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <Txt f={font.black} size={20} color={C.ink} style={{ letterSpacing: -0.3 }}>
+          What did you eat?
+        </Txt>
+        <Txt f={font.body} size={13} color={C.muted} style={{ marginTop: 4, marginBottom: 10 }}>
+          Type freely — we&apos;ll break it into foods and macros. Or jump to Scan / Search anytime.
+        </Txt>
+
+        <TextInput
+          ref={inputRef}
+          value={text}
+          onChangeText={setText}
+          multiline
+          placeholder="e.g. 2 chapati, beans stew, boiled egg and a mug of chai"
+          placeholderTextColor={C.muted2}
+          style={{ minHeight: 110, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.line, borderRadius: radius.lg, padding: 14, color: C.ink, fontFamily: font.body, fontSize: 16, textAlignVertical: 'top' }}
+        />
+
+        <Pressable
+          onPress={runDescribe}
+          disabled={loading || !text.trim()}
+          style={({ pressed }) => ({
+            marginTop: 12,
+            height: 52,
+            borderRadius: radius.md,
+            backgroundColor: text.trim() ? C.brand : C.line,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            opacity: pressed ? 0.9 : 1,
+          })}>
+          {loading ? (
+            <ActivityIndicator color={C.white} />
+          ) : (
+            <>
+              <Ionicons name="sparkles" size={17} color={C.white} />
+              <Txt f={font.bold} size={15} color={C.white}>
+                Analyze meal
+              </Txt>
+            </>
+          )}
+        </Pressable>
+
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+          <QuickJump icon="camera" label="Scan photo" color={C.brand} onPress={() => onJump('scan')} />
+          <QuickJump icon="mic" label="Voice" color={C.water} onPress={() => onJump('voice')} />
+          <QuickJump icon="search" label="Search foods" color={C.ink} onPress={() => onJump('search')} />
+        </View>
+
+        {!!error && !loading && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 14, backgroundColor: C.dangerBg, borderRadius: radius.md, padding: 12 }}>
+            <Ionicons name="alert-circle" size={17} color={C.danger} />
+            <Txt f={font.bodyMed} size={13} color={C.danger} style={{ flex: 1 }}>
+              {error}
+            </Txt>
+          </View>
+        )}
+
+        {items.length > 0 && (
+          <>
+            {!!summary && (
+              <Txt f={font.body} size={13} color={C.muted} style={{ marginTop: 18, marginBottom: 4 }}>
+                {summary}
+              </Txt>
+            )}
+            <Txt f={font.mono} size={11} color={C.muted} style={{ letterSpacing: 1.2, marginTop: 12, marginBottom: 8 }}>
+              ITEMS — TAP TO ADJUST
+            </Txt>
+            {items.map((it, i) => (
+              <ResultCard key={i} item={it} onChange={(next) => setItems((arr) => arr.map((x, j) => (j === i ? next : x)))} />
+            ))}
+          </>
+        )}
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 22, marginBottom: 8 }}>
+          <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+          <Txt f={font.body} size={12} color={C.muted}>
+            or enter macros yourself
+          </Txt>
+          <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
+        </View>
+
+        <ManualField label="Food name" value={name} onChangeText={setName} placeholder="e.g. Grandma's beef pilau" autoCapitalize="sentences" />
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <ManualField label="Calories" value={calories} onChangeText={setCalories} placeholder="0" keyboardType="number-pad" suffix="kcal" style={{ flex: 1 }} />
+          <ManualField label="Protein" value={protein} onChangeText={setProtein} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} />
+        </View>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          <ManualField label="Carbs" value={carbs} onChangeText={setCarbs} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
+          <ManualField label="Fat" value={fat} onChangeText={setFat} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
+          <ManualField label="Fiber" value={fiber} onChangeText={setFiber} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
+        </View>
+      </ScrollView>
+
+      {selectedCount > 0 ? (
+        <LogBar
+          label={`Add ${selectedCount} item${selectedCount === 1 ? '' : 's'}`}
+          kcal={items.filter((i) => i._on).reduce((s, it) => s + it.calories * it._qty, 0)}
+          onPress={() => onLog(items, undefined, 'Describe')}
+        />
+      ) : (
+        <LogBar label="Add meal" kcal={Number(calories) || 0} onPress={saveManual} />
+      )}
+    </KeyboardAvoidingView>
+  );
+}
+
+function QuickJump({
+  icon,
+  label,
+  color,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  color: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => ({
+        flex: 1,
+        alignItems: 'center',
+        gap: 4,
+        paddingVertical: 10,
+        borderRadius: radius.md,
+        backgroundColor: color + '14',
+        borderWidth: 1,
+        borderColor: color + '28',
+        opacity: pressed ? 0.85 : 1,
+      })}>
+      <Ionicons name={icon} size={18} color={color} />
+      <Txt f={font.bodySemi} size={11} color={color}>
+        {label}
+      </Txt>
+    </Pressable>
   );
 }
 
@@ -536,171 +756,6 @@ function VoiceTab({ token, onLog }: { token: string | null; onLog: (items: Stage
           onPress={() => onLog(items, undefined, 'Voice')}
         />
       )}
-    </KeyboardAvoidingView>
-  );
-}
-
-/* ─────────────────────────────── Manual ─────────────────────────────── */
-
-function ManualTab({ token, onLog }: { token: string | null; onLog: (items: Staged[], photo?: string, source?: string) => void }) {
-  const [name, setName] = useState('');
-  const [portion, setPortion] = useState('');
-  const [calories, setCalories] = useState('');
-  const [protein, setProtein] = useState('');
-  const [carbs, setCarbs] = useState('');
-  const [fat, setFat] = useState('');
-  const [fiber, setFiber] = useState('');
-  const [sugar, setSugar] = useState('');
-  const [photo, setPhoto] = useState<string | null>(null);
-  const [autoFilling, setAutoFilling] = useState(false);
-  const [error, setError] = useState('');
-  const [autoNote, setAutoNote] = useState('');
-
-  const score = nutritionScore({
-    calories: Number(calories) || 0,
-    protein: Number(protein) || 0,
-    carbs: Number(carbs) || 0,
-    fat: Number(fat) || 0,
-    fiber: Number(fiber) || 0,
-    sugar: Number(sugar) || 0,
-  });
-
-  const autoFill = async (fromCamera: boolean) => {
-    setError('');
-    setAutoNote('');
-    const data = await pickImage(fromCamera);
-    if (!data) return;
-    setPhoto(data);
-    if (!token) return setError('Please sign in again to auto-fill from a photo.');
-    setAutoFilling(true);
-    try {
-      const res = await api.scan(token, data);
-      const list = res.items || [];
-      if (!list.length) {
-        setAutoNote(res.summary || 'No food detected — enter the facts manually below.');
-      } else {
-        const t = list.reduce(
-          (a, it) => ({
-            calories: a.calories + (it.calories || 0),
-            protein: a.protein + (it.protein || 0),
-            carbs: a.carbs + (it.carbs || 0),
-            fat: a.fat + (it.fat || 0),
-            fiber: a.fiber + (it.fiber || 0),
-          }),
-          { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
-        );
-        if (!name.trim()) setName(list.length === 1 ? list[0].name : res.summary || `${list.length} items`);
-        setCalories(String(Math.round(t.calories)));
-        setProtein(String(Math.round(t.protein)));
-        setCarbs(String(Math.round(t.carbs)));
-        setFat(String(Math.round(t.fat)));
-        setFiber(String(Math.round(t.fiber)));
-        setAutoNote(res.summary || 'Nutritional facts filled in from your photo — tweak anything below.');
-      }
-    } catch (e: any) {
-      setError(e?.message || 'Could not read that photo. Enter the facts manually.');
-    } finally {
-      setAutoFilling(false);
-    }
-  };
-
-  const save = () => {
-    setError('');
-    if (!name.trim()) return setError('Give your food a name.');
-    if (!calories && !protein && !carbs && !fat) return setError('Enter at least the calories or a macro.');
-    const item: Staged = {
-      name: name.trim(),
-      serving: portion.trim() ? `${portion.trim()} g` : '1 serving',
-      category: 'Meal',
-      calories: Number(calories) || 0,
-      protein: Number(protein) || 0,
-      carbs: Number(carbs) || 0,
-      fat: Number(fat) || 0,
-      fiber: Number(fiber) || 0,
-      _qty: 1,
-      _on: true,
-    };
-    onLog([item], photo || undefined, 'Manual');
-  };
-
-  return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        {/* Photo + auto-fill */}
-        <Pressable
-          onPress={() => autoFill(false)}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.line, borderStyle: photo ? 'solid' : 'dashed', borderRadius: radius.lg, padding: 12 }}>
-          {photo ? (
-            <Image source={{ uri: photo }} style={{ width: 64, height: 64, borderRadius: radius.md, backgroundColor: C.bgElevated }} contentFit="cover" />
-          ) : (
-            <View style={{ width: 64, height: 64, borderRadius: radius.md, backgroundColor: C.bgElevated, alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="image-outline" size={26} color={C.muted2} />
-            </View>
-          )}
-          <Txt f={font.bodyMed} size={15} color={C.textSub} style={{ flex: 1 }}>
-            What did you eat? 😋
-          </Txt>
-        </Pressable>
-
-        <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
-          <BigButton icon="camera" label="Snap photo" onPress={() => autoFill(true)} solid />
-          <BigButton icon="sparkles" label="Auto-fill facts" onPress={() => autoFill(false)} />
-        </View>
-
-        {autoFilling && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14, justifyContent: 'center' }}>
-            <ActivityIndicator color={C.brand} />
-            <Txt f={font.bodyMed} size={13.5} color={C.textSub}>
-              Reading the nutritional facts…
-            </Txt>
-          </View>
-        )}
-        {!!autoNote && !autoFilling && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, backgroundColor: C.brandTint, borderRadius: radius.md, padding: 11 }}>
-            <Ionicons name="sparkles" size={15} color={C.brandDark} />
-            <Txt f={font.bodyMed} size={12.5} color={C.brandDark} style={{ flex: 1 }}>
-              {autoNote}
-            </Txt>
-          </View>
-        )}
-
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 18, marginBottom: 6 }}>
-          <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-          <Txt f={font.body} size={12} color={C.muted}>
-            or edit manually
-          </Txt>
-          <View style={{ flex: 1, height: 1, backgroundColor: C.line }} />
-        </View>
-
-        <ManualField label="Food name" value={name} onChangeText={setName} placeholder="e.g. Grandma's beef pilau" autoCapitalize="sentences" />
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          <ManualField label="Portion size" value={portion} onChangeText={setPortion} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} />
-          <ManualField label="Calories" value={calories} onChangeText={setCalories} placeholder="0" keyboardType="number-pad" suffix="kcal" style={{ flex: 1 }} />
-        </View>
-        <Txt f={font.mono} size={11} color={C.muted} style={{ letterSpacing: 1.2, marginTop: 8, marginBottom: 10 }}>
-          MACRONUTRIENTS
-        </Txt>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <ManualField label="Fat" value={fat} onChangeText={setFat} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
-          <ManualField label="Protein" value={protein} onChangeText={setProtein} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
-          <ManualField label="Carbs" value={carbs} onChangeText={setCarbs} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
-        </View>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <ManualField label="Fiber" value={fiber} onChangeText={setFiber} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
-          <ManualField label="Sugar" value={sugar} onChangeText={setSugar} placeholder="0" keyboardType="decimal-pad" suffix="g" style={{ flex: 1 }} compact />
-        </View>
-
-        {/* Nutrition score */}
-        <NutritionScoreBar score={score} />
-
-        {!!error && (
-          <Txt f={font.bodyMed} size={13} color={C.danger} style={{ marginTop: 14 }}>
-            {error}
-          </Txt>
-        )}
-      </ScrollView>
-
-      <LogBar label="Add meal" kcal={Number(calories) || 0} onPress={save} />
     </KeyboardAvoidingView>
   );
 }

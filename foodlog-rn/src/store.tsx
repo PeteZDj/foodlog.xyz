@@ -6,6 +6,7 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import {
   DayEntry,
   DayTotals,
@@ -22,6 +23,7 @@ import {
 } from '@/data/types';
 import { FOODS } from '@/data/foods';
 import { api, ApiUser } from '@/data/api';
+import { mergeFoodlogState } from '@/data/merge';
 import { todayKey, uid } from '@/util';
 
 const STATE_KEY = 'foodlog_state_v2';
@@ -140,11 +142,20 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
             if (!me.user) {
               await clearAuth();
             } else {
+              // Keep Google avatar fresh from /me
+              if (me.user.avatar && me.user.avatar !== savedAuth.user.avatar) {
+                const patched = { ...savedAuth, user: { ...savedAuth.user, ...me.user, avatar: me.user.avatar } };
+                setAuth(patched);
+                AsyncStorage.setItem(AUTH_KEY, JSON.stringify(patched)).catch(() => {});
+              }
               const remote = await api.getState(savedAuth.token);
               if (remote.state) {
-                const hydrated = hydrate(remote.state);
+                const local = stateRef.current;
+                const hydrated = hydrate(mergeFoodlogState(local, remote.state));
                 setState(hydrated);
                 AsyncStorage.setItem(STATE_KEY, JSON.stringify(hydrated)).catch(() => {});
+                // Push merged state back so the website picks up phone-only items.
+                api.putState(savedAuth.token, hydrated).catch(() => {});
               }
             }
           } catch {
@@ -175,9 +186,35 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
       setSyncing(true);
       api
         .putState(tok, stateRef.current)
+        .then((res: any) => {
+          if (res?.state) {
+            const hydrated = hydrate(res.state);
+            stateRef.current = hydrated;
+            setState(hydrated);
+            AsyncStorage.setItem(STATE_KEY, JSON.stringify(hydrated)).catch(() => {});
+          }
+        })
         .catch(() => {})
         .finally(() => setSyncing(false));
     }, 1200);
+  }, []);
+
+  // Re-pull when the app returns to the foreground so website logs appear on phone.
+  useEffect(() => {
+    const onChange = (next: AppStateStatus) => {
+      if (next !== 'active') return;
+      const tok = authRef.current?.token;
+      if (!tok) return;
+      api.getState(tok).then((remote) => {
+        if (!remote.state) return;
+        const hydrated = hydrate(mergeFoodlogState(stateRef.current, remote.state));
+        stateRef.current = hydrated;
+        setState(hydrated);
+        AsyncStorage.setItem(STATE_KEY, JSON.stringify(hydrated)).catch(() => {});
+      }).catch(() => {});
+    };
+    const sub = AppState.addEventListener('change', onChange);
+    return () => sub.remove();
   }, []);
 
   const persist = useCallback((next: FoodlogState) => {
@@ -194,11 +231,11 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
     authRef.current = nextAuth;
     await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(nextAuth)).catch(() => {});
 
-    // Pull any existing account state; otherwise start fresh (new users onboard).
+    // Pull any existing account state and merge with anything already cached.
     let next: FoodlogState;
     try {
       const remote = await api.getState(result.token);
-      next = remote.state ? hydrate(remote.state) : emptyState();
+      next = remote.state ? hydrate(mergeFoodlogState(stateRef.current, remote.state)) : emptyState();
     } catch {
       next = emptyState();
     }

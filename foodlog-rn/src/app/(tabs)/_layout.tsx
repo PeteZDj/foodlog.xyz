@@ -1,8 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { Redirect, router, Tabs } from 'expo-router';
 import { Platform, Pressable, View } from 'react-native';
 import { useFoodlog } from '@/store';
 import { C, font } from '@/theme';
+
+function AccountTabIcon({ color, size }: { color: string; size: number }) {
+  const { user, profile } = useFoodlog();
+  const uri = user?.avatar || profile?.photo;
+  if (uri) {
+    return (
+      <Image
+        source={{ uri }}
+        style={{ width: size + 2, height: size + 2, borderRadius: (size + 2) / 2, borderWidth: 1.5, borderColor: color }}
+        contentFit="cover"
+      />
+    );
+  }
+  return <Ionicons name="person-circle-outline" size={size} color={color} />;
+}
 
 export default function TabsLayout() {
   const { ready, user, onboarded } = useFoodlog();
@@ -40,11 +56,10 @@ export default function TabsLayout() {
         />
         <Tabs.Screen
           name="account"
-          options={{ title: 'Account', tabBarIcon: ({ color, size }) => <Ionicons name="person-circle-outline" size={size} color={color} /> }}
+          options={{ title: 'Account', tabBarIcon: ({ color, size }) => <AccountTabIcon color={color} size={size} /> }}
         />
       </Tabs>
 
-      {/* Center action — quick access to the add-food sheet */}
       <View
         pointerEvents="box-none"
         style={{ position: 'absolute', left: 0, right: 0, bottom: Platform.OS === 'ios' ? 44 : 32, alignItems: 'center' }}>

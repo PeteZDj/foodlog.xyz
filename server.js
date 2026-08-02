@@ -5,6 +5,7 @@ import cors from 'cors';
 import pg from 'pg';
 import crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
+import { mergeFoodlogState } from './merge-state.js';
 
 const { Pool } = pg;
 const PORT = process.env.PORT || 3012;
@@ -264,7 +265,7 @@ app.get('/api/sync', wrap(async (req, res) => {
   res.json({ state: rows[0]?.state || null });
 }));
 
-// POST /api/sync — save user's foodlog state
+// POST /api/sync — save user's foodlog state (merged with existing so phone/web don't clobber)
 app.post('/api/sync', wrap(async (req, res) => {
   const user = await getSessionUser(req);
   if (!user) return res.status(401).json({ error: 'unauthorized' });
@@ -272,13 +273,16 @@ app.post('/api/sync', wrap(async (req, res) => {
   const { state } = req.body || {};
   if (!state) return res.status(400).json({ error: 'state required' });
 
+  const existing = (await q('SELECT state FROM foodlog_state WHERE user_id = $1', [user.id])).rows[0]?.state || null;
+  const merged = mergeFoodlogState(existing, state);
+
   await q(
     `INSERT INTO foodlog_state (user_id, state, updated_at)
      VALUES ($1, $2::jsonb, NOW())
      ON CONFLICT (user_id) DO UPDATE SET state = EXCLUDED.state, updated_at = NOW()`,
-    [user.id, JSON.stringify(state)]
+    [user.id, JSON.stringify(merged)]
   );
-  res.json({ ok: true });
+  res.json({ ok: true, state: merged });
 }));
 
 // POST /api/scan — identify food from a photo using Gemini vision (Africa-aware)
