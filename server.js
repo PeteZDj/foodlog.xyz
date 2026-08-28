@@ -6,24 +6,39 @@ import pg from 'pg';
 import crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import { mergeFoodlogState } from './merge-state.js';
+import paystack from '../_lib/paystack/index.mjs';
+import {
+  initBillingDb, mountBilling, spendScanCredit, usableCredits, FREE_SCANS_ON_SIGNUP
+} from './billing.js';
+import { initAdRewardsDb, mountAdRewards } from './ad-rewards.js';
+import affiliate from '../_lib/affiliate/index.mjs';
+
+// Paystack credentials are shared server-wide; see _lib/paystack.
+paystack.loadSharedEnv();
 
 const { Pool } = pg;
 const PORT = process.env.PORT || 3012;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '355354020888-nmt0qlr55adgprvhaht50oamstv637qs.apps.googleusercontent.com';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+const BASE_URL = (process.env.SITE_URL || 'https://foodlog.xyz').replace(/\/$/, '');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const gClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 const app = express();
 
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({
+  limit: '10mb',
+  // Paystack signs the RAW bytes, so keep a copy before parsing.
+  verify: (req, _res, buf) => { req.rawBody = buf; }
+}));
 
 const q = (sql, params) => pool.query(sql, params);
 const wrap = fn => (req, res, next) => fn(req, res).catch(next);
 
 async function initDb() {
+  // billing tables are created at the end of this function
   await q(`
     CREATE TABLE IF NOT EXISTS users (
       id            TEXT PRIMARY KEY DEFAULT gen_random_uuid()::TEXT,
@@ -333,13 +348,39 @@ app.post('/api/scan', wrap(async (req, res) => {
   if (!user) return res.status(401).json({ error: 'unauthorized' });
   if (!GEMINI_API_KEY) return res.status(503).json({ error: 'Food scanning is not configured on the server.' });
 
+  // Photo analysis is the metered feature - it is what costs money to serve.
+  // Spend the credit before calling Gemini so a burst of requests cannot run
+  // up the AI bill past what the user paid for. Refunded below if the scan
+  // fails for a reason that is our fault.
+  const remaining = await spendScanCredit(q, user.id);
+  if (remaining === null) {
+    return res.status(402).json({
+      error: 'You are out of photo scans. Get a pass to keep scanning.',
+      scans_left: 0,
+      buy_url: '/pricing'
+    });
+  }
+  const refundScan = async (why) => {
+    await q(
+      `UPDATE users SET scan_credits = scan_credits + 1 WHERE id = $1`, [user.id]
+    );
+    await q(
+      `INSERT INTO foodlog_credit_events (user_id, delta, reason, balance_after)
+       VALUES ($1, 1, $2, (SELECT scan_credits FROM users WHERE id = $1))`,
+      [user.id, `refund:${why}`]
+    );
+  };
+
   const { image } = req.body || {};
   if (!image || typeof image !== 'string') return res.status(400).json({ error: 'image required' });
 
   const match = image.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.*)$/);
   const mimeType = match ? match[1] : 'image/jpeg';
   const data = match ? match[2] : image;
-  if (!data || data.length < 100) return res.status(400).json({ error: 'image looks empty' });
+  if (!data || data.length < 100) {
+    await refundScan('empty-image');
+    return res.status(400).json({ error: 'image looks empty' });
+  }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
   const payload = {
@@ -360,12 +401,14 @@ app.post('/api/scan', wrap(async (req, res) => {
     clearTimeout(timer);
   } catch (err) {
     console.error('scan fetch failed', err);
+    await refundScan('gemini-unreachable');
     return res.status(502).json({ error: 'The food recognizer is temporarily unavailable. Please try again.' });
   }
 
   if (!gRes.ok) {
     const body = await gRes.text().catch(() => '');
     console.error('scan gemini error', gRes.status, body.slice(0, 400));
+    await refundScan('gemini-error');
     return res.status(502).json({ error: 'The food recognizer could not read that photo. Try a clearer, well-lit shot.' });
   }
 
@@ -383,6 +426,7 @@ app.post('/api/scan', wrap(async (req, res) => {
     try { parsed = JSON.parse(m ? m[0] : '{}'); } catch { parsed = null; }
   }
   if (!parsed || !Array.isArray(parsed.items)) {
+    await refundScan('unparseable');
     return res.status(502).json({ error: 'Could not understand the photo. Try again or add the food manually.' });
   }
 
@@ -400,7 +444,11 @@ app.post('/api/scan', wrap(async (req, res) => {
     note: String(it.note || '').slice(0, 120)
   })).filter(it => it.calories > 0 || it.protein > 0 || it.carbs > 0 || it.fat > 0);
 
-  res.json({ items, summary: String(parsed.summary || '').slice(0, 240) });
+  res.json({
+    items,
+    summary: String(parsed.summary || '').slice(0, 240),
+    scans_left: remaining
+  });
 }));
 
 // POST /api/parse — turn a free-text meal description into structured, logged foods
@@ -520,6 +568,22 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-initDb().then(() => {
+mountBilling(app, { q, wrap, getSessionUser, baseUrl: BASE_URL });
+mountAdRewards(app, { q, wrap, getSessionUser });
+
+// The affiliate routes expect req.user; foodlog resolves the session per-request.
+const affiliateAuth = wrap(async (req, res, next) => {
+  const user = await getSessionUser(req);
+  if (!user) return res.status(401).json({ error: 'unauthorized' });
+  req.user = user;
+  next();
+});
+affiliate.mountAffiliate(app, { q, wrap, auth: affiliateAuth, site: 'foodlog', baseUrl: BASE_URL });
+
+initDb()
+  .then(() => initBillingDb(q))
+  .then(() => initAdRewardsDb(q))
+  .then(() => affiliate.initAffiliateDb(q, { userIdType: 'TEXT' }))
+  .then(() => {
   app.listen(PORT, () => console.log(`foodlog-api :${PORT}`));
 }).catch(err => { console.error('DB init failed', err); process.exit(1); });

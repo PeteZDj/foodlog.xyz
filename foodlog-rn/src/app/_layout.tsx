@@ -43,6 +43,7 @@ export default function RootLayout() {
           <UpdateGate />
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="auth" options={{ animation: 'none' }} />
             <Stack.Screen name="add" options={{ presentation: 'modal' }} />
             <Stack.Screen name="food/[id]" />
             <Stack.Screen name="custom-food" options={{ presentation: 'modal' }} />
