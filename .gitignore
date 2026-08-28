@@ -49,3 +49,9 @@ next-env.d.ts
 *.binlog
 *.aab
 !public/downloads/foodlog.apk
+*.bak
+*.bak-*
+*.tmp-*
+*-backup-*.sql
+*.db.bak-*
+.env.local.bak-*

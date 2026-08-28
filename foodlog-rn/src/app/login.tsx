@@ -6,6 +6,7 @@ import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollVie
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Mark } from '@/components/shared';
 import { AUTH_REDIRECT, GOOGLE_BRIDGE_URL } from '@/data/api';
+import { parseAuthCallback } from '@/data/auth-callback';
 import { useFoodlog } from '@/store';
 import { C, font, radius } from '@/theme';
 import { Txt } from '@/ui';
@@ -49,24 +50,15 @@ export default function LoginScreen() {
         setBusy(null);
         return;
       }
-      const hash = result.url.split('#')[1] || result.url.split('?')[1] || '';
-      const params = new URLSearchParams(hash);
-      const token = params.get('token');
-      if (!token) throw new Error('Google sign-in did not complete.');
-      let avatar: string | undefined;
-      const userB64 = params.get('user');
-      const atob = (globalThis as any).atob as ((s: string) => string) | undefined;
-      if (userB64 && typeof atob === 'function') {
-        try {
-          const u = JSON.parse(decodeURIComponent(escape(atob(userB64))));
-          avatar = u.avatar;
-        } catch { /* avatar optional */ }
-      }
-      await signInWithSession(token, {
-        id: params.get('id') || undefined,
-        name: params.get('name') || 'Foodlog user',
-        email: params.get('email') || '',
-        avatar,
+      // Same parsing as the foodlog://auth deep-link route, so the two paths
+      // can never disagree about what a callback URL means.
+      const callback = parseAuthCallback(result.url);
+      if (!callback) throw new Error('Google sign-in did not complete.');
+      await signInWithSession(callback.token, {
+        id: callback.user.id || '',
+        name: callback.user.name,
+        email: callback.user.email,
+        avatar: callback.user.avatar,
       });
       router.replace('/');
     } catch (e: any) {
