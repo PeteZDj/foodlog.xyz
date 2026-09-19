@@ -62,8 +62,15 @@
         p.set('email', (d.user && d.user.email) || '');
         // Full user object (base64url JSON) so the app can hydrate the avatar too.
         try { p.set('user', btoa(unescape(encodeURIComponent(JSON.stringify(d.user || {}))))); } catch (e) {}
-        // Hand the real Foodlog session token back to the native app.
-        window.location.href = 'foodlog://auth#' + p.toString();
+        // Hand the real Foodlog session token back to the native app (both query and hash supported).
+        var redirectUrl = 'foodlog://auth?' + p.toString() + '#' + p.toString();
+        window.location.href = redirectUrl;
+
+        setTimeout(function() {
+          setMsg('Tap below if you were not automatically returned to the app.');
+          document.getElementById('buttonWrap').innerHTML =
+            '<a href="' + redirectUrl + '" style="display:inline-block;background:#000;color:#fff;padding:12px 24px;border-radius:24px;text-decoration:none;font-weight:600;font-size:15px;">Open Foodlog App</a>';
+        }, 1200);
       } catch (e) {
         setMsg('Sign-in failed. Please try again.');
         renderButton();

@@ -1,11 +1,11 @@
 {
   "apps": {
     "foodlog": {
-      "versionCode": 5,
-      "versionName": "1.4.0",
-      "apkUrl": "https://foodlog.xyz/downloads/foodlog-1.4.0.apk",
-      "notes": "Fix phone/website meal sync. Type-what-you-ate is now the default add screen. Meal time auto-picks Breakfast/Lunch/Dinner. Google profile photo on the Account tab.",
-      "mandatory": false,
+      "versionCode": 6,
+      "versionName": "1.5.0",
+      "apkUrl": "https://foodlog.xyz/downloads/foodlog-1.5.0.apk",
+      "notes": "Fix Google Sign-In on mobile, photo scan passes, and meal sync.",
+      "mandatory": true,
       "sizeMB": 63.6
     }
   }

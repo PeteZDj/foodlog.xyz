@@ -65,15 +65,17 @@ export function parseAuthCallback(url: string | null | undefined): AuthCallback 
   // accept both rather than depending on which the bridge used.
   const hashPart = url.includes('#') ? url.slice(url.indexOf('#') + 1) : '';
   const queryPart = url.includes('?') ? url.slice(url.indexOf('?') + 1).split('#')[0] : '';
-  const raw = hashPart || queryPart;
-  if (!raw) return null;
 
-  const params = new URLSearchParams(raw);
-  const token = params.get('token');
+  const hashParams = new URLSearchParams(hashPart);
+  const queryParams = new URLSearchParams(queryPart);
+
+  const token = hashParams.get('token') || queryParams.get('token');
   if (!token) return null;
 
+  const getParam = (key: string) => hashParams.get(key) || queryParams.get(key);
+
   let avatar: string | undefined;
-  const userB64 = params.get('user');
+  const userB64 = getParam('user');
   if (userB64) {
     const decoded = decodeBase64(userB64);
     if (decoded) {
@@ -89,9 +91,9 @@ export function parseAuthCallback(url: string | null | undefined): AuthCallback 
   return {
     token,
     user: {
-      id: params.get('id') || undefined,
-      name: params.get('name') || 'Foodlog user',
-      email: params.get('email') || '',
+      id: getParam('id') || undefined,
+      name: getParam('name') || 'Foodlog user',
+      email: getParam('email') || '',
       avatar,
     },
   };

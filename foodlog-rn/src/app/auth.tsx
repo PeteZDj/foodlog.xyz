@@ -1,5 +1,5 @@
 import * as Linking from 'expo-linking';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { Mark } from '@/components/shared';
@@ -20,37 +20,63 @@ import { Txt } from '@/ui';
  */
 export default function AuthCallbackScreen() {
   const url = Linking.useURL();
+  const searchParams = useLocalSearchParams<{ token?: string; id?: string; name?: string; email?: string; user?: string }>();
   const { signInWithSession } = useFoodlog();
   const [error, setError] = useState('');
-  // A cold start delivers the URL immediately and the effect can run twice in
-  // development; make sure sign-in is only attempted once.
   const handled = useRef(false);
 
   useEffect(() => {
     if (handled.current) return;
 
-    // Wait for the URL - on a cold start it arrives a tick after mount.
-    if (url === null) return;
-
-    const callback = parseAuthCallback(url);
-
-    if (!callback) {
+    // Helper to finish sign in once callback payload is resolved
+    const completeAuth = (callback: ReturnType<typeof parseAuthCallback>) => {
+      if (!callback || handled.current) return;
       handled.current = true;
-      setError('That sign-in link was incomplete. Please try again.');
-      return;
+      signInWithSession(callback.token, {
+        id: callback.user.id || '',
+        name: callback.user.name,
+        email: callback.user.email,
+        avatar: callback.user.avatar,
+      })
+        .then(() => router.replace('/'))
+        .catch((e: any) => setError(e?.message || 'Could not finish signing you in.'));
+    };
+
+    // 1. Check if Expo Router already parsed the query string into route params
+    if (searchParams?.token) {
+      const q = new URLSearchParams(searchParams as Record<string, string>).toString();
+      const cb = parseAuthCallback(`foodlog://auth?${q}`);
+      if (cb) {
+        completeAuth(cb);
+        return;
+      }
     }
 
-    handled.current = true;
+    // 2. Check full Linking URL (hash or query)
+    if (url) {
+      const cb = parseAuthCallback(url);
+      if (cb) {
+        completeAuth(cb);
+        return;
+      }
+    }
 
-    signInWithSession(callback.token, {
-      id: callback.user.id || '',
-      name: callback.user.name,
-      email: callback.user.email,
-      avatar: callback.user.avatar,
-    })
-      .then(() => router.replace('/'))
-      .catch((e: any) => setError(e?.message || 'Could not finish signing you in.'));
-  }, [url, signInWithSession]);
+    // 3. Fallback: check initial URL in case useURL() was not yet populated on cold start
+    Linking.getInitialURL().then((initUrl) => {
+      if (handled.current || !initUrl) return;
+      const cb = parseAuthCallback(initUrl);
+      if (cb) completeAuth(cb);
+    }).catch(() => {});
+  }, [url, searchParams, signInWithSession]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!handled.current) {
+        setError('Sign-in took too long or was incomplete. Please try again.');
+      }
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.ink, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 18 }}>

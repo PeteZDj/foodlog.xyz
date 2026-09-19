@@ -2,7 +2,7 @@
   "expo": {
     "name": "Foodlog",
     "slug": "foodlog-rn",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "foodlog",
@@ -14,7 +14,7 @@
     },
     "android": {
       "package": "xyz.foodlog.app",
-      "versionCode": 5,
+      "versionCode": 6,
       "adaptiveIcon": {
         "backgroundColor": "#17643A",
         "foregroundImage": "./assets/images/adaptive-foreground.png"

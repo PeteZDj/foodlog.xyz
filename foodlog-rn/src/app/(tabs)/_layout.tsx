@@ -5,7 +5,7 @@ import { Platform, Pressable, View } from 'react-native';
 import { useFoodlog } from '@/store';
 import { C, font } from '@/theme';
 
-function AccountTabIcon({ color, size }: { color: string; size: number }) {
+function AccountTabIcon({ color, size }: { color: any; size: number }) {
   const { user, profile } = useFoodlog();
   const uri = user?.avatar || profile?.photo;
   if (uri) {
