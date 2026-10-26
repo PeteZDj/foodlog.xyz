@@ -1,0 +1,1595 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Foodlog">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <meta name="description" content="FoodLog is Africa's food & nutrition tracker. Snap a photo of your meal — ugali, jollof, injera, nyama choma — and get calories, protein and macros in seconds. Free, private, African-first.">
+  <title>FoodLog — Africa's food &amp; nutrition tracker</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="FoodLog — Africa's food & nutrition tracker">
+  <meta property="og:description" content="Snap a photo of your plate and get calories & macros in seconds. Built for African food. Free & private.">
+  <meta property="og:image" content="https://foodlog.xyz/img/hero-platter.jpg">
+  <meta property="og:url" content="https://foodlog.xyz/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FoodLog — Africa's food & nutrition tracker">
+  <meta name="twitter:description" content="Snap a photo of your plate and get calories & macros in seconds. Built for African food.">
+  <meta name="twitter:image" content="https://foodlog.xyz/img/hero-platter.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=18">
+
+    <link rel="canonical" href="https://foodlog.xyz/">
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://foodlog.xyz/#website","url":"https://foodlog.xyz/","name":"FoodLog","description":"FoodLog is Africa"},{"@type":"Organization","@id":"https://foodlog.xyz/#owner","name":"FoodLog","url":"https://foodlog.xyz/"}]}</script>
+    <script defer src="https://afrosoftware.com/_a/a.js" data-site="foodlog.xyz"></script>
+</head>
+<body>
+  <section class="lp" id="landing">
+    <nav class="lp-nav">
+      <a class="lp-brand" href="/" aria-label="Foodlog home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>foodlog</span>
+      </a>
+      <div class="lp-links">
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#foods">African foods</a>
+        <a href="/foods">Food library</a>
+        <a href="#faq">FAQ</a>
+        <a href="/pricing">Pricing</a>
+      </div>
+      <div class="lp-nav-cta">
+        <span class="lp-flag" id="lpFlag" hidden><img alt="" width="22" height="16"><span></span></span>
+        <a class="lp-android" href="/downloads/foodlog-android.apk?v=1.6.0" download>Android app</a>
+        <div class="lp-auth-actions" id="lpAuthActions">
+          <button class="button button-primary lp-authbtn" id="lpAuthBtn" type="button">Sign in / Sign up</button>
+        </div>
+        <div class="lp-user" id="lpUser" hidden>
+          <button class="button button-primary lp-login" data-enter-app>Open my log</button>
+          <div class="lp-avatar-wrap">
+            <button class="lp-avatar" id="lpAvatar" type="button" aria-label="Your account" aria-haspopup="true">FL</button>
+            <div class="lp-avatar-menu" id="lpAvatarMenu" hidden>
+              <div class="lp-avatar-head"><strong id="lpUserName">My foodlog</strong><span id="lpUserEmail"></span></div>
+              <button type="button" data-enter-app>Open my log</button>
+              <a href="/foods">Food library</a>
+              <button type="button" id="lpSignOut">Sign out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <header class="lp-hero">
+      <div class="lp-hero-copy">
+        <span class="lp-eyebrow">01 / Africa's food &amp; nutrition tracker</span>
+        <h1>Know exactly<br>what's on <em>your plate.</em></h1>
+        <p class="lp-lede">FoodLog is the nutrition tracker built for African plates. Snap a photo of your meal — ugali, jollof, injera, nyama choma — and get calories, protein and macros in seconds. Then watch the patterns add up, one honest day at a time.</p>
+        <div class="lp-hero-actions">
+          <button class="button button-primary lp-cta" data-enter-app>Scan your first meal</button>
+          <a class="lp-cta-ghost" href="#how">See how it works <span>↓</span></a>
+        </div>
+        <div class="lp-proof">
+          <div><strong>140+</strong><span>African &amp; global foods</span></div>
+          <div><strong>AI</strong><span>photo scanning</span></div>
+          <div><strong>Free</strong><span>&amp; private by default</span></div>
+        </div>
+      </div>
+      <div class="lp-hero-visual">
+        <figure class="lp-hero-photo">
+          <img src="/img/hero-platter.jpg" alt="A plate of ugali, nyama choma, sukuma wiki and kachumbari" loading="eager" width="1024" height="1024">
+        </figure>
+        <div class="lp-hero-chip">
+          <span class="lp-chip-tag">Scanned in 3s</span>
+          <strong>Ugali · Nyama choma · Sukuma</strong>
+          <div class="lp-chip-macros">
+            <span><b>1,240</b>kcal</span><span><b>82g</b>protein</span><span><b>Sure</b>match</span>
+          </div>
+        </div>
+        <div class="lp-nf" id="lpNfHero" aria-hidden="true"></div>
+        <div class="lp-phone lp-phone-hero" aria-hidden="true">
+          <div class="lp-phone-screen">
+            <div class="lp-phone-status"><span>9:41</span><span class="lp-phone-sig"><i></i><i></i><i></i><i></i></span></div>
+            <div class="lp-phone-app">
+              <div class="lp-phone-top"><span class="lp-phone-brand"><i></i><i></i><i></i></span><span class="lp-phone-day">Today</span></div>
+              <div class="lp-phone-ring">
+                <svg viewBox="0 0 120 120"><circle class="lp-ring-track" cx="60" cy="60" r="52"/><circle class="lp-ring-prog" cx="60" cy="60" r="52"/></svg>
+                <div class="lp-phone-ring-c"><strong>1,240</strong><span>kcal left</span></div>
+        </div>
+              <div class="lp-phone-macros">
+                <div><span>Protein <b>82g</b></span><i style="--w:74%"></i></div>
+                <div><span>Carbs <b>146g</b></span><i style="--w:58%"></i></div>
+                <div><span>Fat <b>44g</b></span><i style="--w:40%"></i></div>
+      </div>
+              <div class="lp-phone-meals">
+                <div class="lp-phone-meal"><span class="lp-pm-ic meal-glyph-breakfast"><svg viewBox="0 0 24 24"><path d="M3 18h18M5 18a7 7 0 0 1 14 0M12 4v3M4.6 8.6l1.4 1.4M19.4 8.6 18 10M2 18h2M20 18h2"/></svg></span><div><strong>Breakfast</strong><span>Uji · Mandazi</span></div><b>420</b></div>
+                <div class="lp-phone-meal"><span class="lp-pm-ic meal-glyph-lunch"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg></span><div><strong>Lunch</strong><span>Ugali · Nyama choma</span></div><b>640</b></div>
+    </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="lp-trust">
+      <p>Helping people build healthier habits across Kenya, Nigeria, Ghana, South Africa &amp; beyond</p>
+      <div class="lp-trust-stats">
+        <div><strong>4.8/5</strong><span>early tester rating</span></div>
+        <div><strong>140+</strong><span>foods, African-first</span></div>
+        <div><strong>12</strong><span>nutrients tracked</span></div>
+        <div><strong>100%</strong><span>your data, private</span></div>
+      </div>
+    </section>
+
+    <section class="lp-how" id="how">
+      <div class="lp-section-head">
+        <span class="lp-eyebrow">02 / How it works</span>
+        <h2>From plate to insight in three taps.</h2>
+        <p>No tiny portions to weigh, no endless searching. Point, shoot, and let FoodLog do the counting.</p>
+      </div>
+      <div class="lp-how-grid">
+        <div class="lp-steps">
+          <article class="lp-step">
+            <span class="lp-step-n">01</span>
+            <div><h3>Snap or upload</h3><p>Open the scanner and capture your whole plate — at home, at the kibanda, or at a wedding.</p></div>
+          </article>
+          <article class="lp-step">
+            <span class="lp-step-n">02</span>
+            <div><h3>AI reads your plate</h3><p>FoodLog recognises African dishes and estimates calories, protein, carbs, fat and fibre for each item.</p></div>
+          </article>
+          <article class="lp-step">
+            <span class="lp-step-n">03</span>
+            <div><h3>Track &amp; improve</h3><p>Confirm the items and every meal feeds your daily score, macro balance and long-term trends.</p></div>
+          </article>
+        </div>
+        <figure class="lp-how-photo">
+          <img src="/img/scan-plate.jpg" alt="Scanning a plate of food with a phone" loading="lazy" width="1024" height="1024">
+          <div class="lp-nf lp-nf-sm" id="lpNfHow" aria-hidden="true"></div>
+          <div class="lp-phone lp-phone-camera" aria-hidden="true">
+            <div class="lp-phone-screen">
+              <div class="lp-phone-camerashot" style="background-image:url('/img/dish-jollof.jpg')">
+                <span class="lp-cam-corner tl"></span><span class="lp-cam-corner tr"></span><span class="lp-cam-corner bl"></span><span class="lp-cam-corner br"></span>
+                <span class="lp-cam-hint">Frame the whole plate</span>
+                <span class="lp-cam-shutter"></span>
+              </div>
+            </div>
+          </div>
+          <figcaption><span class="lp-live-dot"></span>Point the camera — get a full nutrition breakdown.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="lp-features" id="features">
+      <div class="lp-section-head">
+        <span class="lp-eyebrow">03 / Everything you need</span>
+        <h2>A complete nutrition workspace.</h2>
+        <p>More than a calorie counter — a clear, private system for understanding how you actually eat.</p>
+      </div>
+      <div class="lp-feature-grid">
+        <article class="lp-feature">
+          <span class="lp-feature-ic"><svg viewBox="0 0 24 24"><path d="M3 9V7a2 2 0 0 1 2-2h2M17 5h2a2 2 0 0 1 2 2v2M21 15v2a2 2 0 0 1-2 2h-2M7 19H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+          <h3>AI food scanner</h3>
+          <p>Photograph any meal and get an instant, editable breakdown — trained to know African dishes, not just Western ones.</p>
+        </article>
+        <article class="lp-feature">
+          <span class="lp-feature-ic"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span>
+          <h3>African-first food library</h3>
+          <p>140+ foods built in — ugali, jollof, injera, matoke, pilau, githeri, chapati, suya — plus a global product search.</p>
+        </article>
+        <article class="lp-feature">
+          <span class="lp-feature-ic"><svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V2"/></svg></span>
+          <h3>Macros &amp; 12 nutrients</h3>
+          <p>Protein, carbs, fat and fibre per meal, plus sodium, sugars, iron, calcium and more on a familiar nutrition label.</p>
+        </article>
+        <article class="lp-feature">
+          <span class="lp-feature-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg></span>
+          <h3>Calendar &amp; meal planner</h3>
+          <p>Review logged days and plan meals weeks ahead. Copy yesterday, build routines, and stay consistent.</p>
+        </article>
+        <article class="lp-feature">
+          <span class="lp-feature-ic"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></span>
+          <h3>Reports &amp; insights</h3>
+          <p>Move from a single day to weekly, monthly, quarterly and yearly views. Export to CSV or PDF anytime.</p>
+        </article>
+        <article class="lp-feature">
+          <span class="lp-feature-ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <h3>Private &amp; free</h3>
+          <p>Your log lives with you and syncs to your account — no ads, no selling data. Just clarity about your food.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="lp-cuisine" id="foods">
+      <div class="lp-section-head">
+        <span class="lp-eyebrow">04 / Built for how Africa eats</span>
+        <h2>The dishes you actually eat — already counted.</h2>
+        <p>Most trackers make you force a plate of ugali and sukuma into "cornmeal" and "collard greens". FoodLog speaks your food.</p>
+      </div>
+      <div class="lp-cuisine-grid">
+        <a class="lp-dish" href="/foods?food=jollof-rice"><img src="/img/dish-jollof.jpg" alt="Jollof rice" loading="lazy"><span class="lp-dish-cap"><strong>Jollof rice</strong><span>West Africa</span></span><span class="lp-dish-go">View food →</span></a>
+        <a class="lp-dish" href="/foods?food=injera"><img src="/img/dish-injera.jpg" alt="Injera with stews" loading="lazy"><span class="lp-dish-cap"><strong>Injera &amp; wot</strong><span>Ethiopia</span></span><span class="lp-dish-go">View food →</span></a>
+        <a class="lp-dish" href="/foods?food=pilau"><img src="/img/dish-pilau.jpg" alt="Pilau rice" loading="lazy"><span class="lp-dish-cap"><strong>Pilau</strong><span>Swahili coast</span></span><span class="lp-dish-go">View food →</span></a>
+        <a class="lp-dish" href="/foods?food=matoke"><img src="/img/dish-matoke.jpg" alt="Matoke stew" loading="lazy"><span class="lp-dish-cap"><strong>Matoke</strong><span>Uganda</span></span><span class="lp-dish-go">View food →</span></a>
+        <a class="lp-dish" href="/foods?food=chapati"><img src="/img/dish-chapati-beans.jpg" alt="Chapati and beans" loading="lazy"><span class="lp-dish-cap"><strong>Chapati &amp; beans</strong><span>East Africa</span></span><span class="lp-dish-go">View food →</span></a>
+        <a class="lp-dish" href="/foods?food=grilled-tilapia"><img src="/img/dish-tilapia.jpg" alt="Grilled tilapia with ugali" loading="lazy"><span class="lp-dish-cap"><strong>Grilled tilapia</strong><span>Lake &amp; coast</span></span><span class="lp-dish-go">View food →</span></a>
+        <a class="lp-dish" href="/foods?food=mango"><img src="/img/dish-fruit.jpg" alt="Tropical fruit bowl" loading="lazy"><span class="lp-dish-cap"><strong>Tropical fruit</strong><span>Mango, pawpaw</span></span><span class="lp-dish-go">View food →</span></a>
+        <a class="lp-dish" href="/foods?food=mandazi"><img src="/img/dish-breakfast.jpg" alt="Mandazi and chai" loading="lazy"><span class="lp-dish-cap"><strong>Mandazi &amp; chai</strong><span>Morning staple</span></span><span class="lp-dish-go">View food →</span></a>
+      </div>
+    </section>
+
+    <section class="lp-spotlight">
+      <figure class="lp-spotlight-photo">
+        <img src="/img/scan-plate.jpg" alt="Scanning African food with a phone camera" loading="lazy">
+        <div class="lp-nf lp-nf-sm" id="lpNfScan" aria-hidden="true"></div>
+        <div class="lp-phone lp-phone-scan" aria-hidden="true">
+          <div class="lp-phone-screen">
+            <div class="lp-phone-status"><span>9:41</span><span class="lp-phone-sig"><i></i><i></i><i></i><i></i></span></div>
+            <div class="lp-phone-app">
+              <div class="lp-phone-shot" style="background-image:url('/img/dish-pilau.jpg')"><span class="lp-phone-scanbadge">AI scan complete</span></div>
+              <div class="lp-phone-scanlist">
+                <div class="lp-phone-scanrow"><span class="lp-emoji">🍚</span><div><strong>Pilau</strong><span>1.5 cups · 520 kcal</span></div><em class="ok">Sure</em></div>
+                <div class="lp-phone-scanrow"><span class="lp-emoji">🥩</span><div><strong>Beef</strong><span>120g · 240 kcal</span></div><em class="ok">Sure</em></div>
+                <div class="lp-phone-scanrow"><span class="lp-emoji">🥗</span><div><strong>Kachumbari</strong><span>1 cup · 40 kcal</span></div><em class="mid">Likely</em></div>
+              </div>
+              <div class="lp-phone-cta">Add 3 items to log</div>
+            </div>
+          </div>
+        </div>
+      </figure>
+      <div class="lp-spotlight-copy">
+        <span class="lp-eyebrow">05 / The scanner</span>
+        <h2>Stop guessing. Start scanning.</h2>
+        <p>Weighing every ingredient is exhausting — so most people quit. FoodLog's camera scanner reads the whole plate at once and gives you a confident, editable estimate you can log in seconds.</p>
+        <ul class="lp-check">
+          <li>Recognises mixed plates and multiple dishes at once</li>
+          <li>Estimates realistic portion sizes from the photo</li>
+          <li>Tuned for African home cooking &amp; street food</li>
+          <li>Always editable — you stay in control of your log</li>
+        </ul>
+        <button class="button button-primary lp-cta" data-enter-app>Try the scanner</button>
+      </div>
+    </section>
+
+    <section class="lp-numbers">
+      <div class="lp-section-head lp-center">
+        <span class="lp-eyebrow">06 / Nutrition, decoded</span>
+        <h2>Clear numbers, calm design.</h2>
+        <p>Every meal rolls up into the metrics that matter — without the noise.</p>
+      </div>
+      <div class="lp-numbers-grid">
+        <div class="lp-num"><strong>Daily score</strong><span>A single 0–100 read on how balanced your day is.</span></div>
+        <div class="lp-num"><strong>Macro balance</strong><span>Protein, carbs, fat &amp; fibre against your own goals.</span></div>
+        <div class="lp-num"><strong>Hydration</strong><span>Track water glasses alongside every meal.</span></div>
+        <div class="lp-num"><strong>Weight &amp; exercise</strong><span>Log movement and watch your trend over time.</span></div>
+        <div class="lp-num"><strong>Streaks</strong><span>Small, consistent logs become useful patterns.</span></div>
+        <div class="lp-num"><strong>Full nutrition label</strong><span>An FDA-style label for any day or period.</span></div>
+      </div>
+    </section>
+
+    <section class="lp-quotes">
+      <div class="lp-section-head lp-center">
+        <span class="lp-eyebrow">07 / Loved by early users</span>
+        <h2>Real plates. Real progress.</h2>
+      </div>
+      <div class="lp-quote-grid">
+        <blockquote class="lp-quote"><p>“Finally a tracker that knows what jollof and egusi are. I stopped fighting the app and just started logging.”</p><footer><strong>Amara O.</strong><span>Lagos, Nigeria</span></footer></blockquote>
+        <blockquote class="lp-quote"><p>“I photograph my lunch, tap confirm, and I'm done. My protein is up and I actually understand my meals now.”</p><footer><strong>Wanjiru K.</strong><span>Nairobi, Kenya</span></footer></blockquote>
+        <blockquote class="lp-quote"><p>“The reports show my whole month at a glance. It's simple, it's fast, and it respects my privacy.”</p><footer><strong>Thabo M.</strong><span>Johannesburg, SA</span></footer></blockquote>
+      </div>
+    </section>
+
+    <section class="lp-faq" id="faq">
+      <div class="lp-section-head">
+        <span class="lp-eyebrow">08 / Questions</span>
+        <h2>Everything you might ask.</h2>
+      </div>
+      <div class="lp-faq-list">
+        <details class="lp-faq-item" open><summary>Is FoodLog free?</summary><p>Yes. FoodLog is free to use. Sign in with Google and your log syncs securely to your account across devices.</p></details>
+        <details class="lp-faq-item"><summary>How does the food scanner work?</summary><p>You take or upload a photo of your meal. Our AI identifies each food, estimates the portion and returns calories and macros. You can edit or remove anything before it's logged.</p></details>
+        <details class="lp-faq-item"><summary>Does it really know African foods?</summary><p>Yes — that's the whole point. The scanner and the built-in library are tuned for East, West and Southern African dishes like ugali, jollof, injera, matoke, pilau, githeri, suya and many more.</p></details>
+        <details class="lp-faq-item"><summary>How accurate are the estimates?</summary><p>Photo estimates are a fast, honest starting point, not a lab measurement. Every scanned item is fully editable, and you can fine-tune servings or swap in exact foods anytime.</p></details>
+        <details class="lp-faq-item"><summary>Is my data private?</summary><p>Your food data is yours. It's stored on your device and synced to your account — never sold, and there are no ads.</p></details>
+        <details class="lp-faq-item"><summary>Is there a mobile app?</summary><p>Yes, there's a native Android app. <a href="/downloads/foodlog-android.apk?v=1.6.0" download>Download the APK</a> and log on the go — the website works great on mobile too.</p></details>
+      </div>
+    </section>
+
+    <section class="lp-final">
+      <h2>Start tracking your plate today.</h2>
+      <p>Scan your next meal and see your nutrition come into focus — clear, private, and built for African food.</p>
+      <div class="lp-final-actions">
+        <button class="button button-primary lp-cta" data-enter-app>Open my log</button>
+        <a class="lp-cta-ghost light" href="/downloads/foodlog-android.apk?v=1.6.0" download>Get the Android app <span>↓</span></a>
+      </div>
+    </section>
+
+    <footer class="lp-footer">
+      <div class="lp-footer-main">
+        <div class="lp-footer-brand">
+          <a class="lp-brand light" href="#" aria-label="Foodlog home">
+            <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>foodlog</span>
+          </a>
+          <p>Africa's food &amp; nutrition tracker. Snap a photo, know your plate, build better habits.</p>
+          <div class="lp-social">
+            <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+            <a href="https://x.com" target="_blank" rel="noopener" aria-label="X"><svg viewBox="0 0 24 24"><path d="M4 4l16 16M20 4 4 20"/></svg></a>
+            <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M15 3h-3a4 4 0 0 0-4 4v3H5v4h3v7h4v-7h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          </div>
+        </div>
+        <div class="lp-footer-cols">
+          <div class="lp-footer-col">
+            <h4>Product</h4>
+            <a href="#features">Food scanner</a>
+            <a href="#foods">African foods</a>
+            <a href="#how">How it works</a>
+            <button data-enter-app>Meal planner</button>
+            <button data-enter-app>Reports</button>
+          </div>
+          <div class="lp-footer-col">
+            <h4>Get the app</h4>
+            <a href="/ios">iPhone App &amp; iOS (.ipa)</a>
+            <a href="/downloads/foodlog-android.apk?v=1.6.0" download>Android APK (v1.6.0)</a>
+            <a href="/downloads/foodlog.aab" download>Google Play Bundle (.aab)</a>
+            <button data-enter-app>Open on web</button>
+            <a href="#faq">FAQ</a>
+          </div>
+          <div class="lp-footer-col">
+            <h4>Company</h4>
+            <a href="https://afrosoftware.com" target="_blank" rel="noopener">AfroSoftware</a>
+            <a href="#faq">Privacy</a>
+            <a href="#faq">Terms</a>
+            <a href="/delete-account">Delete account &amp; data</a>
+          </div>
+          <div class="lp-footer-col">
+            <h4>Contact</h4>
+            <a href="mailto:team@foodlog.xyz">team@foodlog.xyz</a>
+            <a href="https://docall.app/foodlog.xyz" target="_blank" rel="noopener">&#9742; Call us on docall.app/foodlog.xyz</a>
+          </div>
+        </div>
+      </div>
+      <div class="lp-footer-bottom">
+        <span>© <span id="lpYear"></span> foodlog.xyz · Daily nutrition, clearly.</span>
+        <span>Part of <a href="https://afrosoftware.com" target="_blank" rel="noopener">AfroSoftware</a> · Made for African plates.</span>
+      </div>
+    </footer>
+  </section>
+
+  <div class="app-shell app-hidden" id="appShell">
+    <aside class="sidebar">
+      <a class="brand" href="#" id="showLanding" aria-label="Foodlog home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>foodlog</span>
+      </a>
+
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <button class="nav-item active" data-view="today">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/><path d="M8 13h3v3H8z"/></svg>
+          </span>
+          Today
+          <kbd>T</kbd>
+        </button>
+        <button class="nav-item" data-view="calendar">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18M7 13h3M14 13h3M7 17h3M14 17h3"/></svg>
+          </span>
+          Calendar
+          <kbd>C</kbd>
+        </button>
+        <button class="nav-item" data-view="weekly">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18M7 3v3M7 15v6"/></svg>
+          </span>
+          This week
+          <kbd>W</kbd>
+        </button>
+        <button class="nav-item" data-view="monthly">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M7 13h2v2H7zM11 13h2v2h-2zM15 13h2v2h-2z"/></svg>
+          </span>
+          This month
+          <kbd>M</kbd>
+        </button>
+        <button class="nav-item" data-view="history">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>
+          </span>
+          Reports
+          <kbd>H</kbd>
+        </button>
+        <button class="nav-item" data-view="foods">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
+          </span>
+          Food database
+          <kbd>F</kbd>
+        </button>
+      </nav>
+
+      <div class="sidebar-section sidebar-meals-section">
+        <p class="sidebar-label" id="sidebarMealsLabel">Today's meals</p>
+        <div class="sidebar-meals" id="sidebarMeals"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <p class="sidebar-label">Workspace</p>
+        <button class="nav-item" data-view="health">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 12h3l2-5 4 10 2-5h5"/><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+          </span>
+          Exercise & weight
+        </button>
+        <button class="nav-item" data-view="insights">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V2"/></svg>
+          </span>
+          Insights
+        </button>
+        <button class="nav-item" data-view="settings">
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6v-.2h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+          </span>
+          Goals & settings
+        </button>
+      </div>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="streak-card">
+        <div class="streak-top">
+          <span class="streak-icon">◆</span>
+          <span id="streakCount">7 day streak</span>
+        </div>
+        <p>Keep showing up. Small logs become useful patterns.</p>
+        <div class="week-dots" id="weekDots"></div>
+      </div>
+
+      <button class="profile-row" id="profileButton">
+        <div class="avatar" id="sidebarAvatar">FL</div>
+        <div>
+          <strong id="sidebarProfileName">My foodlog</strong>
+          <span id="sidebarProfileMetric">0 kcal today</span>
+        </div>
+        <span class="icon-button small" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+        </span>
+      </button>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="date-control">
+          <button class="icon-button" id="prevDay" aria-label="Previous day">
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button class="date-button" id="dateButton">
+            <span id="dateLabel">Today</span>
+            <small id="fullDateLabel"></small>
+          </button>
+          <button class="icon-button" id="nextDay" aria-label="Next day">
+            <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+          <button class="today-chip" id="todayButton">Today</button>
+          <input type="date" id="datePicker" aria-label="Choose date">
+          <div class="date-pop" id="datePop" hidden role="dialog" aria-label="Pick a date">
+            <div class="date-pop-top">
+              <div class="date-pop-streak" title="Current logging streak">
+                <span class="date-pop-flame" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M12 2c1.5 3 4.5 4.5 4.5 8a4.5 4.5 0 0 1-9 0c0-1 .3-1.8.8-2.5C8.9 8.6 9 10 10 10.5 9.4 8 12 6 12 2Z"/><path d="M12 22a6 6 0 0 0 6-6c0-2.2-1.2-3.8-2.4-5C15 13.5 13.7 14 12 14c1 2-1 3-1 3"/></svg>
+                </span>
+                <strong id="datePopStreak">0</strong>
+                <small>day<br>streak</small>
+              </div>
+              <div class="date-pop-nav">
+                <button type="button" class="icon-button small" id="datePopPrev" aria-label="Previous month"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+                <span id="datePopLabel">—</span>
+                <button type="button" class="icon-button small" id="datePopNext" aria-label="Next month"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+              </div>
+            </div>
+            <div class="date-pop-weekdays" id="datePopWeekdays"></div>
+            <div class="date-pop-grid" id="datePopGrid"></div>
+            <div class="date-pop-foot">
+              <div class="date-pop-legend"><i class="lg-log"></i>Logged<i class="lg-goal"></i>On&nbsp;target</div>
+              <button type="button" class="date-pop-today" id="datePopToday">Jump to today</button>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="search-trigger" id="globalSearch">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <span>Search foods</span>
+            <kbd>⌘ K</kbd>
+          </button>
+          <button class="button button-secondary" id="describeFoodTop">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 12.5h5"/></svg>
+            Describe
+          </button>
+          <button class="button button-secondary" id="scanFoodTop">
+            <svg viewBox="0 0 24 24"><path d="M3 9V7a2 2 0 0 1 2-2h2M17 5h2a2 2 0 0 1 2 2v2M21 15v2a2 2 0 0 1-2 2h-2M7 19H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/></svg>
+            Scan food
+          </button>
+          <button class="button button-primary" id="addFoodTop">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Log food
+          </button>
+          <div class="top-user">
+            <button class="top-avatar" id="topUserBtn" type="button" aria-label="Your account" aria-haspopup="true" aria-expanded="false">FL</button>
+            <div class="top-user-menu" id="topUserMenu" hidden role="menu" aria-label="Account menu">
+              <div class="tum-head">
+                <div class="tum-avatar" id="tumAvatar">FL</div>
+                <div class="tum-id">
+                  <strong id="tumName">My foodlog</strong>
+                  <span id="tumEmail">Private account</span>
+                </div>
+              </div>
+              <div class="tum-stats" id="tumStats"></div>
+              <div class="tum-links">
+                <button class="tum-link" data-view="settings" role="menuitem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9M4.6 9a1.7 1.7 0 0 0-.3-1.9"/></svg>Goals &amp; settings</button>
+                <button class="tum-link" data-view="history" role="menuitem"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Reports &amp; trends</button>
+                <button class="tum-link" data-view="health" role="menuitem"><svg viewBox="0 0 24 24"><path d="M4 12h3l2-5 4 10 2-5h5"/></svg>Exercise &amp; weight</button>
+                <button class="tum-link" data-view="foods" role="menuitem"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>Food database</button>
+              </div>
+              <div class="tum-foot">
+                <button class="tum-signout" id="tumSignOut" role="menuitem"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign out</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="view active" id="todayView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Daily log <span id="completionBadge">On track</span></p>
+            <h1 id="greeting">Good afternoon.</h1>
+            <p>Here is how your nutrition is shaping up today.</p>
+          </div>
+          <button class="button button-secondary" id="copyYesterday">
+            <svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+            Copy yesterday
+          </button>
+        </div>
+        <div class="planned-banner" id="plannedBanner" hidden>
+          <div><strong>Future meal plan</strong><span> Foods added here are marked as planned until this date arrives.</span></div>
+          <button class="button button-secondary" id="backToToday">Back to today</button>
+        </div>
+
+        <section class="summary-grid today-block" data-block="summary">
+          <button class="block-drag" type="button" aria-label="Drag to reorder" title="Drag to reorder this section"><svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg></button>
+          <article class="calorie-card">
+            <div class="card-heading">
+              <div>
+                <p class="card-kicker">Energy</p>
+                <h2>Daily calories</h2>
+              </div>
+              <button class="more-button" data-view="settings" aria-label="Edit calorie goal">
+                <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+              </button>
+            </div>
+            <div class="calorie-content">
+              <div class="calorie-ring" id="calorieRing">
+                <div class="ring-inner">
+                  <strong id="caloriesRemaining">0</strong>
+                  <span>kcal left</span>
+                </div>
+              </div>
+              <div class="calorie-stats">
+                <div>
+                  <span>Consumed</span>
+                  <strong id="caloriesConsumed">0</strong>
+                </div>
+                <div>
+                  <span>Daily goal</span>
+                  <strong id="calorieGoal">2,200</strong>
+                </div>
+                <div>
+                  <span>Progress</span>
+                  <strong id="caloriePercent">0%</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="macro-card">
+            <div class="card-heading">
+              <div>
+                <p class="card-kicker">Macronutrients</p>
+                <h2>Daily balance</h2>
+              </div>
+              <span class="live-dot">Live</span>
+            </div>
+            <div class="macro-list">
+              <div class="macro-row" data-macro="protein">
+                <div class="macro-meta">
+                  <span><i class="macro-symbol protein"></i>Protein</span>
+                  <strong><b id="proteinValue">0</b> / <span id="proteinGoal">150</span>g</strong>
+                </div>
+                <div class="progress-track"><i id="proteinBar"></i></div>
+              </div>
+              <div class="macro-row" data-macro="carbs">
+                <div class="macro-meta">
+                  <span><i class="macro-symbol carbs"></i>Carbohydrates</span>
+                  <strong><b id="carbsValue">0</b> / <span id="carbsGoal">240</span>g</strong>
+                </div>
+                <div class="progress-track"><i id="carbsBar"></i></div>
+              </div>
+              <div class="macro-row" data-macro="fat">
+                <div class="macro-meta">
+                  <span><i class="macro-symbol fat"></i>Fat</span>
+                  <strong><b id="fatValue">0</b> / <span id="fatGoal">70</span>g</strong>
+                </div>
+                <div class="progress-track"><i id="fatBar"></i></div>
+              </div>
+              <div class="macro-row" data-macro="fiber">
+                <div class="macro-meta">
+                  <span><i class="macro-symbol fiber"></i>Fiber</span>
+                  <strong><b id="fiberValue">0</b> / <span id="fiberGoal">30</span>g</strong>
+                </div>
+                <div class="progress-track"><i id="fiberBar"></i></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="score-card">
+            <div class="card-heading">
+              <div>
+                <p class="card-kicker">Daily score</p>
+                <h2>Nutrition quality</h2>
+              </div>
+            </div>
+            <div class="score-value"><strong id="qualityScore">0</strong><span>/100</span></div>
+            <p id="scoreMessage">Log your first meal to calculate a daily score.</p>
+            <div class="score-scale"><i id="scoreBar"></i></div>
+            <div class="score-labels"><span>Needs work</span><span>Excellent</span></div>
+          </article>
+        </section>
+
+        <section class="day-nutrition today-block" data-block="daynutrition">
+          <button class="block-drag" type="button" aria-label="Drag to reorder" title="Drag to reorder this section"><svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg></button>
+          <div class="day-nutrition-copy">
+            <p class="card-kicker">Whole day</p>
+            <h2>Today's Nutrition Facts</h2>
+            <p class="day-nutrition-lead">An FDA-style label for everything you've logged today, totaled across all meals. Every food and meal below has its own label too.</p>
+            <div class="day-nutrition-meta hover-info" id="dayNutritionMeta" data-tip="Calories = total energy for the day. Score rates how balanced your meals are (protein, fiber, variety). Items = foods logged."></div>
+            <div class="day-meals-breakdown" id="dayMealsBreakdown"></div>
+            <div class="day-notes">
+              <label for="dayNotes">Notes for the day</label>
+              <textarea id="dayNotes" maxlength="1200" placeholder="How did today feel? Energy, cravings, workouts, how meals sat with you…"></textarea>
+              <span class="day-notes-status" id="dayNotesStatus"></span>
+            </div>
+          </div>
+          <div class="day-nutrition-label" id="dayNutritionLabel"></div>
+        </section>
+
+        <section class="log-section today-block" data-block="log">
+          <button class="block-drag" type="button" aria-label="Drag to reorder" title="Drag to reorder this section"><svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg></button>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Meal timeline</p>
+              <h2>Today's food log</h2>
+            </div>
+            <div class="section-summary">
+              <span class="hover-info" data-tip="Total number of foods you've logged today across all meals."><strong id="mealCount">0</strong> items</span>
+              <span class="hover-info" data-tip="Total energy (kilocalories) from every food logged today."><strong id="mealCalories">0</strong> kcal</span>
+            </div>
+          </div>
+          <div class="meal-groups" id="mealGroups"></div>
+        </section>
+
+        <section class="water-section today-block" data-block="water">
+          <button class="block-drag" type="button" aria-label="Drag to reorder" title="Drag to reorder this section"><svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg></button>
+          <div class="water-heading">
+            <div class="water-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2S5 10 5 15a7 7 0 0 0 14 0c0-5-7-13-7-13Z"/></svg>
+            </div>
+            <div>
+              <p class="card-kicker">Hydration</p>
+              <h3>Water intake</h3>
+            </div>
+          </div>
+          <div class="water-cups" id="waterCups"></div>
+          <div class="water-total"><strong id="waterTotal">0</strong><span> / 8 glasses</span></div>
+          <button class="button button-secondary" id="addWater">+ Add glass</button>
+        </section>
+      </section>
+
+      <section class="view" id="calendarView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Meal planner</p>
+            <h1>Calendar.</h1>
+            <p>Review completed days and plan meals weeks or months ahead.</p>
+          </div>
+          <button class="button button-primary" id="planMealButton">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Plan a meal
+          </button>
+        </div>
+        <div class="calendar-toolbar">
+          <div class="period-tabs" id="calendarModeTabs">
+            <button class="active" data-calendar-mode="month">Month</button>
+            <button data-calendar-mode="week">Week</button>
+          </div>
+          <div class="period-range">
+            <button class="icon-button" id="calendarPrev" aria-label="Previous calendar period"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+            <strong id="calendarLabel">This month</strong>
+            <button class="icon-button" id="calendarNext" aria-label="Next calendar period"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+          </div>
+        </div>
+        <div class="calendar-legend">
+          <span><i class="complete"></i> Logged</span>
+          <span><i class="planned"></i> Planned</span>
+          <span><i class="today"></i> Today</span>
+        </div>
+        <div class="calendar-board panel" id="calendarBoard"></div>
+      </section>
+
+      <section class="view" id="weeklyView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">7-day overview</p>
+            <h1>This week.</h1>
+            <p>Your meals and nutrition, totaled and averaged across the week.</p>
+          </div>
+          <div class="period-range">
+            <button class="icon-button" id="weekPrev" aria-label="Previous week"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+            <strong id="weekLabel">This week</strong>
+            <button class="icon-button" id="weekNext" aria-label="Next week"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="today-chip" id="weekToday" hidden>This week</button>
+          </div>
+        </div>
+        <div id="weeklyBody"></div>
+      </section>
+
+      <section class="view" id="monthlyView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Month at a glance</p>
+            <h1>This month.</h1>
+            <p>A calorie heatmap and averaged nutrition for the whole month.</p>
+          </div>
+          <div class="period-range">
+            <button class="icon-button" id="monthPrev" aria-label="Previous month"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+            <strong id="monthLabel">This month</strong>
+            <button class="icon-button" id="monthNext" aria-label="Next month"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+            <button class="today-chip" id="monthToday" hidden>This month</button>
+          </div>
+        </div>
+        <div id="monthlyBody"></div>
+      </section>
+
+      <section class="view" id="historyView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Your patterns</p>
+            <h1>Nutrition history.</h1>
+            <p>Understand your nutrition across any meaningful time range.</p>
+          </div>
+          <div class="heading-actions">
+            <button class="button button-secondary" id="exportCsv"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>Export CSV</button>
+            <button class="button button-primary" id="exportPdf"><svg viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6z"/><path d="M14 2v5h5M9 15h6M9 18h4"/></svg>Export PDF</button>
+          </div>
+        </div>
+        <div class="period-toolbar">
+          <div class="period-tabs" id="periodTabs">
+            <button data-period="day">Day</button>
+            <button class="active" data-period="week">Week</button>
+            <button data-period="month">Month</button>
+            <button data-period="quarter">Quarter</button>
+            <button data-period="year">Year</button>
+          </div>
+          <div class="period-range">
+            <button class="icon-button" id="periodPrev" aria-label="Previous period"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+            <strong id="periodLabel">This week</strong>
+            <button class="icon-button" id="periodNext" aria-label="Next period"><svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+          </div>
+        </div>
+        <div class="history-stat-grid" id="historyStats"></div>
+        <div class="report-grid">
+          <article class="panel history-chart-card">
+            <div class="card-heading">
+              <div><p class="card-kicker" id="chartKicker">Selected period</p><h2>Calories vs goal</h2></div>
+              <span class="legend"><i></i>Daily intake</span>
+            </div>
+            <div class="history-chart" id="historyChart"></div>
+          </article>
+          <aside class="nutrition-label" id="nutritionLabel"></aside>
+        </div>
+        <article class="panel">
+          <div class="card-heading">
+            <div><p class="card-kicker">Daily records</p><h2>Recent logs</h2></div>
+          </div>
+          <div class="history-table" id="historyTable"></div>
+        </article>
+      </section>
+
+      <section class="view" id="foodsView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Reference library</p>
+            <h1>Food database.</h1>
+            <p>Search nutrition facts or create foods you eat often.</p>
+          </div>
+          <div class="heading-actions">
+            <button class="button button-secondary" id="globalDatabaseButton">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.4 3 14.6 0 18M12 3c-3 3.4-3 14.6 0 18"/></svg>
+              Search global foods
+            </button>
+            <button class="button button-primary" id="createFoodButton">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Create custom food
+            </button>
+          </div>
+        </div>
+        <div class="database-toolbar">
+          <label class="database-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+            <input id="databaseSearch" type="search" placeholder="Search by food, brand, or category...">
+          </label>
+          <div class="database-count"><strong id="foodCount">0</strong> foods indexed</div>
+        </div>
+        <div class="food-table" id="foodTable"></div>
+      </section>
+
+      <section class="view" id="insightsView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Calculated for you</p>
+            <h1>Useful insights.</h1>
+            <p>Simple signals from your recent food logs.</p>
+          </div>
+        </div>
+        <div class="insight-grid" id="insightGrid"></div>
+      </section>
+
+      <section class="view" id="healthView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Body & movement</p>
+            <h1>Exercise & weight.</h1>
+            <p>Track movement, energy burned, and long-term weight progress.</p>
+          </div>
+          <div class="heading-actions">
+            <button class="button button-secondary" id="logWeightButton">Log weight</button>
+            <button class="button button-primary" id="logExerciseButton">Log exercise</button>
+          </div>
+        </div>
+        <div class="health-stat-grid" id="healthStats"></div>
+        <div class="health-grid">
+          <article class="panel">
+            <div class="card-heading"><div><p class="card-kicker">Weight trend</p><h2>Last 12 entries</h2></div><span id="weightChangeBadge"></span></div>
+            <div class="weight-chart" id="weightChart"></div>
+          </article>
+          <article class="panel">
+            <div class="card-heading"><div><p class="card-kicker">This week</p><h2>Exercise minutes</h2></div></div>
+            <div class="exercise-week" id="exerciseWeek"></div>
+          </article>
+        </div>
+        <article class="panel health-log-panel">
+          <div class="card-heading"><div><p class="card-kicker">Recent activity</p><h2>Exercise log</h2></div></div>
+          <div class="activity-log" id="activityLog"></div>
+        </article>
+      </section>
+
+      <section class="view" id="settingsView">
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">Your foodlog</p>
+            <h1>Profile & settings.</h1>
+            <p>Personalize your identity, body metrics, goals, and workspace.</p>
+          </div>
+        </div>
+        <form class="settings-layout" id="settingsForm">
+          <aside class="settings-nav panel">
+            <button type="button" class="active" data-settings-tab="profile">Profile</button>
+            <button type="button" data-settings-tab="body">Body & goals</button>
+            <button type="button" data-settings-tab="nutrition">Nutrition</button>
+            <button type="button" data-settings-tab="display">Display</button>
+            <button type="button" data-settings-tab="data">Data & privacy</button>
+          </aside>
+          <div class="settings-content panel">
+            <section class="settings-pane active" data-settings-pane="profile">
+              <div class="settings-intro"><h2>Personal profile</h2><p>This information powers your profile card and health calculations.</p></div>
+              <div class="profile-editor">
+                <div class="profile-photo-editor">
+                  <div class="profile-photo-preview" id="settingsProfilePhoto">FL</div>
+                  <label class="button button-secondary">Upload portrait<input type="file" id="profilePhotoInput" accept="image/*" hidden></label>
+                  <button type="button" class="button button-ghost danger" id="removeProfilePhoto">Remove</button>
+                </div>
+                <div class="form-grid two-col">
+                  <label>Display name<input name="displayName" placeholder="Your name"></label>
+                  <label>Email<input name="email" type="email" placeholder="you@example.com"></label>
+                  <label>Birthday<input name="birthday" type="date"></label>
+                  <label>Favorite food<input name="favoriteFood" placeholder="e.g. Salmon bowl"></label>
+                  <label>Location<input name="location" placeholder="City, country"></label>
+                  <label>Food philosophy<select name="foodPhilosophy"><option>Balanced</option><option>High protein</option><option>Plant forward</option><option>Low carb</option><option>Mediterranean</option><option>Mindful eating</option></select></label>
+                  <label class="wide">Bio<textarea name="bio" rows="3" placeholder="A short note about your nutrition journey"></textarea></label>
+                </div>
+              </div>
+            </section>
+            <section class="settings-pane" data-settings-pane="body">
+              <div class="settings-intro"><h2>Body & goals</h2><p>Use your preferred units and keep your current targets visible.</p></div>
+              <div class="form-grid">
+                <label>Current weight <span id="weightUnitLabel">lb</span><input name="currentWeight" type="number" min="40" max="1000" step=".1"></label>
+                <label>Goal weight <span id="goalWeightUnitLabel">lb</span><input name="goalWeight" type="number" min="40" max="1000" step=".1"></label>
+                <label>Height <span>inches</span><input name="height" type="number" min="36" max="96" step=".1"></label>
+                <label>Activity level<select name="activityLevel"><option>Sedentary</option><option>Lightly active</option><option>Moderately active</option><option>Very active</option><option>Athlete</option></select></label>
+                <label>Primary goal<select name="primaryGoal"><option>Maintain weight</option><option>Lose weight</option><option>Gain weight</option><option>Build muscle</option><option>Improve nutrition</option><option>Train for performance</option></select></label>
+                <label>Weekly exercise goal <span>minutes</span><input name="exerciseGoal" type="number" min="0" max="3000"></label>
+              </div>
+            </section>
+            <section class="settings-pane" data-settings-pane="nutrition">
+              <div class="settings-intro"><h2>Daily nutrition targets</h2><p>Targets update every chart, progress bar, and daily score.</p></div>
+              <div class="form-grid">
+                <label>Calories <span>kcal</span><input type="number" name="calories" min="500" max="10000"></label>
+                <label>Protein <span>grams</span><input type="number" name="protein" min="1" max="1000"></label>
+                <label>Carbohydrates <span>grams</span><input type="number" name="carbs" min="1" max="1500"></label>
+                <label>Fat <span>grams</span><input type="number" name="fat" min="1" max="500"></label>
+                <label>Fiber <span>grams</span><input type="number" name="fiber" min="1" max="200"></label>
+                <label>Water <span>glasses</span><input type="number" name="water" min="1" max="30"></label>
+              </div>
+            </section>
+            <section class="settings-pane" data-settings-pane="display">
+              <div class="settings-intro"><h2>Workspace display</h2><p>Choose what appears beneath your profile in the sidebar.</p></div>
+              <div class="form-grid two-col">
+                <label>Sidebar metric<select name="sidebarMetric"><option value="calories">Calories today</option><option value="remaining">Calories remaining</option><option value="weight">Current weight</option><option value="exercise">Exercise this week</option><option value="streak">Logging streak</option></select></label>
+                <label>Weight units<select name="weightUnit"><option value="lb">Pounds (lb)</option><option value="kg">Kilograms (kg)</option></select></label>
+                <label>Week starts<select name="weekStart"><option value="monday">Monday</option><option value="sunday">Sunday</option></select></label>
+                <label>Default calendar view<select name="calendarDefault"><option value="month">Month</option><option value="week">Week</option></select></label>
+              </div>
+            </section>
+            <section class="settings-pane" data-settings-pane="data">
+              <div class="settings-intro"><h2>Data & privacy</h2><p>Your records remain in this browser unless you export them.</p></div>
+              <div class="data-actions">
+                <button type="button" class="button button-secondary" id="settingsExportCsv">Download CSV</button>
+                <button type="button" class="button button-secondary" id="settingsExportPdf">Download PDF summary</button>
+                <button type="button" class="button button-ghost danger" id="resetData">Reset demo data</button>
+              </div>
+            </section>
+            <div class="settings-savebar">
+              <span id="settingsStatus">Changes are stored locally.</span>
+              <button type="submit" class="button button-primary">Save all settings</button>
+            </div>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="foodModal" aria-hidden="true">
+    <div class="modal food-modal" role="dialog" aria-modal="true" aria-labelledby="foodModalTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Add to your log</p>
+          <h2 id="foodModalTitle">Search the food database</h2>
+        </div>
+        <button class="icon-button modal-close" aria-label="Close modal">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="meal-selector" id="mealSelector"></div>
+      <div class="describe-inline" id="describeInline">
+        <label class="describe-inline-label" for="inlineDescribeInput">What did you eat?</label>
+        <textarea id="inlineDescribeInput" rows="2" placeholder="Type your meal — e.g. 2 chapati, beans stew, boiled egg and chai"></textarea>
+        <div class="describe-inline-actions">
+          <button type="button" class="button button-primary" id="inlineDescribeAnalyze">Analyze meal</button>
+          <span class="describe-inline-hint">AI breaks it into foods + macros. Or search below.</span>
+        </div>
+      </div>
+      <div class="add-actions">
+        <button type="button" class="add-action" id="addActionPhoto">
+          <span class="add-action-ic"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+          <span><strong>Photo</strong><small>Snap or upload</small></span>
+        </button>
+        <button type="button" class="add-action" id="addActionDescribe">
+          <span class="add-action-ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 12.5h5"/></svg></span>
+          <span><strong>Full describe</strong><small>Larger editor</small></span>
+        </button>
+        <button type="button" class="add-action" id="addActionCreate">
+          <span class="add-action-ic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+          <span><strong>Create</strong><small>Custom food</small></span>
+        </button>
+      </div>
+      <div class="modal-search-wrap">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input id="foodSearchInput" type="search" placeholder="Search the database — “chicken”, “ugali”, “coffee”" autocomplete="off">
+        <kbd>ESC</kbd>
+      </div>
+      <div class="food-tabs" id="foodTabs">
+        <button type="button" data-food-tab="recent" class="active">My recent</button>
+        <button type="button" data-food-tab="frequent">Frequent</button>
+        <button type="button" data-food-tab="all">All foods</button>
+      </div>
+      <div class="food-results" id="foodResults"></div>
+      <button class="custom-food-link" id="customFoodLink">Can’t find it? Create a custom food →</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="portionModal" aria-hidden="true">
+    <div class="modal portion-modal" role="dialog" aria-modal="true" aria-labelledby="portionTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Serving details</p>
+          <h2 id="portionTitle">Add food</h2>
+        </div>
+        <button class="icon-button modal-close" aria-label="Close modal">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="portion-summary" id="portionSummary"></div>
+      <form id="portionForm">
+        <div class="portion-fields">
+          <label>Servings
+            <div class="serving-stepper">
+              <button type="button" class="qty-btn" data-serving-step="portion" data-dir="-1" aria-label="Fewer servings"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+              <input type="number" id="servingAmount" min="0.1" max="50" step="0.1" value="1">
+              <button type="button" class="qty-btn" data-serving-step="portion" data-dir="1" aria-label="More servings"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+            </div>
+          </label>
+          <label>Meal<select id="portionMeal"></select></label>
+        </div>
+        <div class="nutrition-preview" id="nutritionPreview"></div>
+        <div class="photo-picker">
+          <div class="photo-preview" id="portionPhotoPreview"><span>No photo</span></div>
+          <div>
+            <strong>Add a meal photo</strong>
+            <p>Upload an image or use your camera. Photos stay in this browser.</p>
+            <div class="photo-actions">
+              <label class="button button-secondary">Upload photo<input type="file" id="portionPhotoInput" accept="image/*" hidden></label>
+              <label class="button button-secondary">Take photo<input type="file" id="portionCameraInput" accept="image/*" capture="environment" hidden></label>
+              <button type="button" class="button button-ghost danger" id="removePortionPhoto">Remove</button>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="button button-primary button-full">Add to daily log</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="customModal" aria-hidden="true">
+    <div class="modal custom-modal" role="dialog" aria-modal="true" aria-labelledby="customTitle">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Your database</p>
+          <h2 id="customTitle">Create custom food</h2>
+        </div>
+        <button class="icon-button modal-close" aria-label="Close modal">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <form id="customFoodForm">
+        <input type="hidden" name="id">
+        <div class="custom-grid">
+          <label class="wide">Food name<input required name="name" placeholder="e.g. Homemade granola"></label>
+          <label class="wide">Serving description<input required name="serving" placeholder="e.g. 1 bowl (120g)"></label>
+          <label>Calories<input required type="number" name="calories" min="0"></label>
+          <label>Protein (g)<input required type="number" name="protein" min="0" step="0.1"></label>
+          <label>Carbs (g)<input required type="number" name="carbs" min="0" step="0.1"></label>
+          <label>Fat (g)<input required type="number" name="fat" min="0" step="0.1"></label>
+          <label>Fiber (g)<input required type="number" name="fiber" min="0" step="0.1"></label>
+          <label>Category<select name="category"><option>Custom</option><option>Meal</option><option>Snack</option><option>Drink</option></select></label>
+          <label>Saturated fat (g)<input type="number" name="saturatedFat" min="0" step="0.1" value="0"></label>
+          <label>Trans fat (g)<input type="number" name="transFat" min="0" step="0.1" value="0"></label>
+          <label>Cholesterol (mg)<input type="number" name="cholesterol" min="0" step="0.1" value="0"></label>
+          <label>Sodium (mg)<input type="number" name="sodium" min="0" step="0.1" value="0"></label>
+          <label>Total sugars (g)<input type="number" name="sugars" min="0" step="0.1" value="0"></label>
+          <label>Added sugars (g)<input type="number" name="addedSugars" min="0" step="0.1" value="0"></label>
+          <label>Vitamin D (mcg)<input type="number" name="vitaminD" min="0" step="0.1" value="0"></label>
+          <label>Calcium (mg)<input type="number" name="calcium" min="0" step="0.1" value="0"></label>
+          <label>Iron (mg)<input type="number" name="iron" min="0" step="0.1" value="0"></label>
+          <label>Potassium (mg)<input type="number" name="potassium" min="0" step="0.1" value="0"></label>
+          <label>Vitamin A (mcg)<input type="number" name="vitaminA" min="0" step="0.1" value="0"></label>
+          <label>Vitamin C (mg)<input type="number" name="vitaminC" min="0" step="0.1" value="0"></label>
+        </div>
+        <button type="submit" class="button button-primary button-full" id="saveCustomFood">Save to database</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="entryModal" aria-hidden="true">
+    <div class="modal entry-modal" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
+      <div class="modal-header">
+        <div><p class="eyebrow">Logged food</p><h2 id="entryTitle">Edit entry</h2></div>
+        <button class="icon-button modal-close" aria-label="Close modal"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <div class="entry-detail-grid">
+        <div class="entry-photo-large" id="entryPhotoPreview"><span>No meal photo</span></div>
+        <form id="entryForm">
+          <input type="hidden" id="entryId">
+          <div class="portion-fields">
+            <label>Servings
+              <div class="serving-stepper">
+                <button type="button" class="qty-btn" data-serving-step="entry" data-dir="-1" aria-label="Fewer servings"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+                <input type="number" id="entryServings" min=".1" max="50" step=".1">
+                <button type="button" class="qty-btn" data-serving-step="entry" data-dir="1" aria-label="More servings"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+              </div>
+            </label>
+            <label>Meal<select id="entryMeal"></select></label>
+          </div>
+          <div class="entry-micro-summary" id="entryMicroSummary"></div>
+          <div class="photo-actions">
+            <label class="button button-secondary">Upload<input type="file" id="entryPhotoInput" accept="image/*" hidden></label>
+            <label class="button button-secondary">Camera<input type="file" id="entryCameraInput" accept="image/*" capture="environment" hidden></label>
+            <button type="button" class="button button-ghost danger" id="removeEntryPhoto">Remove photo</button>
+          </div>
+          <div class="entry-form-actions">
+            <button type="button" class="button button-ghost danger" id="deleteEntryButton">Delete entry</button>
+            <button type="submit" class="button button-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="globalFoodModal" aria-hidden="true">
+    <div class="modal food-modal" role="dialog" aria-modal="true" aria-labelledby="globalFoodTitle">
+      <div class="modal-header">
+        <div><p class="eyebrow">USDA FoodData Central</p><h2 id="globalFoodTitle">Search the national food database</h2></div>
+        <button class="icon-button modal-close" aria-label="Close modal"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <form class="global-search-form" id="globalSearchForm">
+        <label class="modal-search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input id="globalFoodSearchInput" type="search" minlength="2" required placeholder="Search brand or packaged food">
+        </label>
+        <button class="button button-primary" type="submit">Search global database</button>
+      </form>
+      <p class="api-note">Results come from USDA FoodData Central. Some branded records may have incomplete nutrients or serving details.</p>
+      <div class="food-results global-results" id="globalFoodResults"><div class="no-results">Run a search to find packaged products.</div></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="profileModal" aria-hidden="true">
+    <div class="modal profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <div class="modal-header">
+        <div><p class="eyebrow">Personal dashboard</p><h2 id="profileTitle">My profile</h2></div>
+        <button class="icon-button modal-close" aria-label="Close modal"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <div class="profile-hero">
+        <div class="profile-photo-preview large" id="profileModalPhoto">FL</div>
+        <div><h3 id="profileModalName">My foodlog</h3><p id="profileModalBio">A private nutrition workspace.</p><span id="profileModalMeta"></span></div>
+      </div>
+      <div class="profile-stat-grid" id="profileStats"></div>
+      <div class="profile-favorite"><span>Favorite food</span><strong id="profileFavoriteFood">Not set yet</strong></div>
+      <button class="button button-primary button-full" id="editProfileButton">Edit profile & settings</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="exerciseModal" aria-hidden="true">
+    <div class="modal compact-modal" role="dialog" aria-modal="true" aria-labelledby="exerciseTitle">
+      <div class="modal-header">
+        <div><p class="eyebrow">Movement log</p><h2 id="exerciseTitle">Log exercise</h2></div>
+        <button class="icon-button modal-close" aria-label="Close modal"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <form id="exerciseForm">
+        <div class="form-grid two-col">
+          <label>Activity<select name="type"><option>Walking</option><option>Running</option><option>Cycling</option><option>Strength training</option><option>Swimming</option><option>Yoga</option><option>HIIT</option><option>Sports</option><option>Other</option></select></label>
+          <label>Date<input name="date" type="date" required></label>
+          <label>Duration <span>minutes</span><input name="minutes" type="number" min="1" max="1440" required></label>
+          <label>Calories burned <span>kcal</span><input name="calories" type="number" min="0" max="10000"></label>
+          <label class="wide">Notes<input name="notes" placeholder="Route, workout, effort, or personal best"></label>
+        </div>
+        <button class="button button-primary button-full" type="submit">Save exercise</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="weightModal" aria-hidden="true">
+    <div class="modal compact-modal" role="dialog" aria-modal="true" aria-labelledby="weightTitle">
+      <div class="modal-header">
+        <div><p class="eyebrow">Body log</p><h2 id="weightTitle">Log weight</h2></div>
+        <button class="icon-button modal-close" aria-label="Close modal"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <form id="weightForm">
+        <div class="form-grid two-col">
+          <label>Weight <span id="modalWeightUnit">lb</span><input name="weight" type="number" min="40" max="1000" step=".1" required></label>
+          <label>Date<input name="date" type="date" required></label>
+          <label class="wide">Note<input name="notes" placeholder="Optional context"></label>
+        </div>
+        <button class="button button-primary button-full" type="submit">Save weight</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="scanModal" aria-hidden="true">
+    <div class="modal scan-modal" role="dialog" aria-modal="true" aria-labelledby="scanTitle">
+      <div class="modal-header">
+        <div><p class="eyebrow">AI food scanner</p><h2 id="scanTitle">Scan your plate</h2></div>
+        <button class="icon-button modal-close" aria-label="Close modal"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <div class="scan-stage state-camera" id="scanStage">
+        <video id="scanVideo" playsinline muted autoplay></video>
+        <img id="scanPreview" alt="Captured meal">
+        <div class="scan-reticle"><i></i><i></i><i></i><i></i></div>
+        <div class="scan-loading">
+          <span class="scan-spinner"></span>
+          <strong>Reading your plate…</strong>
+          <span>Identifying foods &amp; estimating nutrition</span>
+        </div>
+        <div class="scan-fallback">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <p>Camera unavailable here. Upload a clear photo of your meal instead.</p>
+        </div>
+      </div>
+      <p class="scan-hint" id="scanHint">Frame the whole plate in good light, then capture. Works best on real, unedited photos — African dishes welcome.</p>
+      <div class="meal-selector" id="scanMealSelector"></div>
+      <div class="scan-results" id="scanResults" hidden></div>
+      <div class="scan-controls" id="scanControls">
+        <label class="button button-secondary">Upload photo<input type="file" id="scanUpload" accept="image/*" capture="environment" hidden></label>
+        <button class="button button-primary" id="scanCapture">Capture &amp; analyze</button>
+      </div>
+      <div class="scan-controls" id="scanResultControls" hidden>
+        <button class="button button-secondary" id="scanRetake">Retake</button>
+        <button class="button button-primary" id="scanAddSelected">Add selected to log</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="describeModal" aria-hidden="true">
+    <div class="modal describe-modal" role="dialog" aria-modal="true" aria-labelledby="describeTitle">
+      <div class="modal-header">
+        <div><p class="eyebrow">Natural language</p><h2 id="describeTitle">Describe your meal</h2></div>
+        <button class="icon-button modal-close" aria-label="Close modal"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <p class="describe-lede">Type what you ate in plain words — FoodLog turns it into logged foods with calories &amp; macros.</p>
+      <div class="describe-input-wrap">
+        <textarea id="describeInput" rows="3" placeholder="e.g. Today I ate 1 scrambled egg, 2 pieces of toast, bacon, and 2 glasses of orange juice"></textarea>
+      </div>
+      <div class="describe-examples" id="describeExamples">
+        <button type="button" data-describe-example="Ugali with sukuma wiki and two pieces of nyama choma">Ugali, sukuma &amp; nyama choma</button>
+        <button type="button" data-describe-example="A plate of jollof rice with grilled chicken and a glass of mango juice">Jollof &amp; chicken</button>
+        <button type="button" data-describe-example="2 chapati, a cup of chai and a boiled egg">Chapati &amp; chai</button>
+      </div>
+      <div class="meal-selector" id="describeMealSelector"></div>
+      <div class="describe-loading" id="describeLoading" hidden>
+        <span class="scan-spinner"></span>
+        <strong>Reading your description…</strong>
+        <span>Identifying foods &amp; estimating nutrition</span>
+      </div>
+      <div class="describe-results" id="describeResults" hidden></div>
+      <div class="describe-controls" id="describeControls">
+        <button class="button button-primary button-full" id="describeAnalyze">
+          <svg viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.5 6.5L22 12l-6.5 2.5L13 21l-2.5-6.5L4 12l6.5-2.5z"/></svg>
+          Analyze &amp; break down
+        </button>
+      </div>
+      <div class="describe-controls" id="describeResultControls" hidden>
+        <button class="button button-secondary" id="describeRedo">Edit text</button>
+        <button class="button button-primary" id="describeAddSelected">Add selected to log</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+  <!-- Auth modal (email/password + Google) -->
+  <div class="modal-backdrop" id="authModal" aria-hidden="true">
+    <div class="modal auth-modal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+      <div class="modal-header">
+        <div><p class="eyebrow" id="authModalEyebrow">Welcome to foodlog</p><h2 id="authModalTitle">Sign in</h2></div>
+        <button class="icon-button modal-close" aria-label="Close modal"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <p class="auth-sub" id="authModalSub">Your food log syncs securely to your account across every device.</p>
+      <div class="auth-google" id="authGoogleBtn"></div>
+      <div class="auth-divider"><span>or use your email</span></div>
+      <form id="authForm" class="auth-form" novalidate>
+        <label class="auth-field" id="authNameField" hidden>Full name<input id="authName" name="name" type="text" autocomplete="name" placeholder="Your name"></label>
+        <label class="auth-field">Email<input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></label>
+        <label class="auth-field">Password<input id="authPassword" name="password" type="password" autocomplete="current-password" placeholder="At least 6 characters" minlength="6" required></label>
+        <p class="auth-error" id="authError" hidden></p>
+        <button type="submit" class="button button-primary button-full" id="authSubmit">Sign in</button>
+      </form>
+      <p class="auth-switch-row">
+        <span id="authSwitchText">New to foodlog?</span>
+        <button type="button" id="authSwitch">Create an account</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- Set user-specific storage key before app-v2.js loads -->
+  <script>
+    (function() {
+      try {
+        var s = JSON.parse(localStorage.getItem('foodlog_session'));
+        if (s && s.user && s.user.id) window._foodlogStorageKey = 'foodlog_xyz_v2_' + s.user.id;
+      } catch(e) {}
+    })();
+  </script>
+
+  <script src="foods-data.js?v=3"></script>
+  <script src="app-v2.js?v=31"></script>
+
+  <!-- Homepage floating FDA labels (generated from the shared food database) -->
+  <script>
+    (function () {
+      var D = window.FOODLOG_DATA; if (!D || !D.fdaLabel) return;
+      var byName = {}; (D.FOOD_ROWS || []).forEach(function (r) { byName[r[0]] = { name: r[0], serving: r[1], category: r[2], calories: r[3], protein: r[4], carbs: r[5], fat: r[6], fiber: r[7] }; });
+      var KEYS = ["calories","protein","carbs","fat","fiber","saturatedFat","transFat","cholesterol","sodium","sugars","addedSugars","vitaminD","calcium","iron","potassium","vitaminA","vitaminC"];
+      function nutr(name) { var f = byName[name]; return f ? D.nutrientsFor(f) : null; }
+      function sum(names) { var t = {}; KEYS.forEach(function (k) { t[k] = 0; }); names.forEach(function (n) { var d = nutr(n); if (d) KEYS.forEach(function (k) { t[k] += Number(d[k] || 0); }); }); return t; }
+      function fill(id, data, opts) { var el = document.getElementById(id); if (el && data) el.innerHTML = D.fdaLabel(data, opts); }
+      fill("lpNfHero", sum(["Ugali (maize meal)", "Nyama choma (grilled beef)", "Sukuma wiki"]), { variant: "mini", servingSize: "Ugali · nyama · sukuma", estimated: true });
+      fill("lpNfHow", nutr("Jollof rice"), { variant: "mini", servingSize: "1.5 cups (300g)", estimated: true });
+      fill("lpNfScan", nutr("Pilau (beef)"), { variant: "mini", servingSize: "1.5 cups (300g)", estimated: true });
+    })();
+  </script>
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async></script>
+
+  <script>
+    (function() {
+      var GOOGLE_CLIENT_ID = '355354020888-nmt0qlr55adgprvhaht50oamstv637qs.apps.googleusercontent.com';
+      var SESSION_KEY = 'foodlog_session';
+
+      function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } }
+      function setSession(s) { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+      function clearSession() { localStorage.removeItem(SESSION_KEY); }
+      function $(id) { return document.getElementById(id); }
+
+      // Debounced server sync — hooked into app-v2.js saveState
+      var syncTimeout = null;
+      window._foodlogSyncState = function(state) {
+        var s = getSession();
+        if (!s || !s.token) return;
+        clearTimeout(syncTimeout);
+        syncTimeout = setTimeout(function() {
+          fetch('/api/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.token },
+            body: JSON.stringify({ state: state })
+          }).catch(function(){});
+        }, 2000);
+      };
+
+      // ---------- Country flag (ipapi.co -> flagcdn.com, matches afrosoftware/dj24) ----------
+      (function detectRegion() {
+        var wrap = $('lpFlag'); if (!wrap) return;
+        function apply(cc, name) {
+          if (!cc) return;
+          cc = String(cc).toLowerCase();
+          wrap.querySelector('img').src = 'https://flagcdn.com/24x18/' + cc + '.png';
+          wrap.querySelector('span').textContent = (name || cc.toUpperCase());
+          wrap.title = 'You appear to be browsing from ' + (name || cc.toUpperCase());
+          wrap.hidden = false;
+        }
+        var cached; try { cached = JSON.parse(sessionStorage.getItem('foodlog_geo')); } catch (e) {}
+        if (cached && cached.cc) { apply(cached.cc, cached.name); return; }
+        var opts = {}; try { if (AbortSignal.timeout) opts.signal = AbortSignal.timeout(4500); } catch (e) {}
+        fetch('https://ipapi.co/json/', opts).then(function(r){return r.json();}).then(function(d){
+          var cc = (d.country_code || d.country || '').toUpperCase(); var name = d.country_name || cc;
+          if (cc) { sessionStorage.setItem('foodlog_geo', JSON.stringify({cc:cc,name:name})); apply(cc,name); } else { throw 0; }
+        }).catch(function(){
+          fetch('https://ipwho.is/').then(function(r){return r.json();}).then(function(d){
+            if (d && d.country_code) { sessionStorage.setItem('foodlog_geo', JSON.stringify({cc:d.country_code,name:d.country})); apply(d.country_code, d.country); }
+          }).catch(function(){});
+        });
+      })();
+
+      // ---------- Auth modal (email/password + Google) ----------
+      var authMode = 'login';
+      function openModal(sel) { if (window.foodlogUI && window.foodlogUI.openModal) window.foodlogUI.openModal(sel); else { var m=document.querySelector(sel); if(m){m.classList.add('open'); m.setAttribute('aria-hidden','false'); m.style.cssText='opacity:1;visibility:visible;pointer-events:auto'; document.body.style.overflow='hidden';} } }
+      function closeAuth() { if (window.foodlogUI && window.foodlogUI.closeModal) window.foodlogUI.closeModal('#authModal'); }
+      function clearErr() { var e=$('authError'); e.hidden=true; e.textContent=''; }
+      function showErr(msg) { var e=$('authError'); e.textContent=msg; e.hidden=false; }
+      function setBusy(b) { var s=$('authSubmit'); s.disabled=b; s.textContent = b ? 'Please wait…' : (authMode==='login' ? 'Sign in' : 'Create account'); }
+
+      function renderAuthMode() {
+        var isLogin = authMode === 'login';
+        $('authModalTitle').textContent = isLogin ? 'Sign in' : 'Create your account';
+        $('authModalSub').textContent = isLogin ? 'Welcome back — your food log syncs securely across devices.' : 'Start tracking African plates in seconds. Free & private.';
+        $('authNameField').hidden = isLogin;
+        $('authName').required = !isLogin;
+        $('authPassword').setAttribute('autocomplete', isLogin ? 'current-password' : 'new-password');
+        $('authSubmit').textContent = isLogin ? 'Sign in' : 'Create account';
+        $('authSwitchText').textContent = isLogin ? 'New to foodlog?' : 'Already have an account?';
+        $('authSwitch').textContent = isLogin ? 'Create an account' : 'Sign in instead';
+        clearErr();
+      }
+      function openAuth(mode) {
+        authMode = mode || 'login';
+        renderAuthMode();
+        openModal('#authModal');
+        setTimeout(function(){ initGoogleButton(); ($('authEmail')||{}).focus && $('authEmail').focus(); }, 60);
+      }
+
+      var googleRendered = false;
+      function initGoogleButton() {
+        if (googleRendered) return;
+        if (!(window.google && window.google.accounts)) {
+          var gsi = document.querySelector('script[src*="gsi/client"]');
+          if (gsi) gsi.addEventListener('load', initGoogleButton);
+          return;
+        }
+        window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential, auto_select: false });
+        window.google.accounts.id.renderButton($('authGoogleBtn'), { theme: 'outline', size: 'large', text: 'continue_with', shape: 'rectangular', width: 336 });
+        googleRendered = true;
+      }
+      function handleGoogleCredential(response) { authRequest('/api/auth/google', { credential: response.credential }); }
+
+      function authRequest(url, body) {
+        clearErr(); setBusy(true);
+        fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+          .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+          .then(function(res){ if (!res.ok || res.d.error) throw new Error(res.d.error || 'Something went wrong. Please try again.'); onAuthSuccess(res.d); })
+          .catch(function(err){ showErr(err.message); setBusy(false); });
+      }
+      function onAuthSuccess(data) {
+          setSession(data);
+        // If PersonalOS started an OAuth connect, finish that instead of opening the app.
+        try {
+          var pending = window._personalosPendingConnect;
+          if (pending && pending.redirectUri) {
+            fetch('/api/oauth/authorize', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + data.token },
+              body: JSON.stringify({ client_id: pending.clientId || 'personalos', redirect_uri: pending.redirectUri, state: pending.state || '' })
+            }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+              .then(function(res){
+                if (!res.ok || res.d.error) throw new Error(res.d.error || 'Authorize failed');
+                var url = new URL(pending.redirectUri);
+                url.searchParams.set('foodlog_code', res.d.code);
+                if (pending.state) url.searchParams.set('state', pending.state);
+                window.location.href = url.toString();
+              })
+              .catch(function(err){ alert(err.message || 'Could not connect PersonalOS'); window.location.href = '/app'; });
+            return;
+          }
+        } catch (e) {}
+        fetch('/api/sync', { headers: { 'Authorization': 'Bearer ' + data.token } })
+          .then(function(r){ return r.json(); })
+          .then(function(sync){ if (sync && sync.state) localStorage.setItem('foodlog_xyz_v2_' + data.user.id, JSON.stringify(sync.state)); window.location.href = '/app'; })
+          .catch(function(){ window.location.href = '/app'; });
+      }
+
+      $('authForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = $('authEmail').value.trim();
+        var password = $('authPassword').value;
+        if (!email || !password) return showErr('Please enter your email and password.');
+        if (authMode === 'login') authRequest('/api/auth/login', { email: email, password: password });
+        else {
+          var name = $('authName').value.trim();
+          if (!name) return showErr('Please enter your name.');
+          if (password.length < 6) return showErr('Password must be at least 6 characters.');
+          authRequest('/api/auth/register', { name: name, email: email, password: password });
+        }
+      });
+      $('authSwitch').addEventListener('click', function() { authMode = authMode === 'login' ? 'register' : 'login'; renderAuthMode(); });
+      if ($('lpAuthBtn')) $('lpAuthBtn').addEventListener('click', function(){ openAuth('login'); });
+
+      // Intercept [data-enter-app] clicks in capture phase — before app-v2.js sees them
+      document.addEventListener('click', function(e) {
+        var btn = e.target.closest('[data-enter-app]');
+        if (!btn) return;
+        if (!getSession()) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          openAuth('login');
+        }
+      }, true);
+
+      // ---------- Sign out ----------
+      function signOut() {
+        var s = getSession();
+        if (s && s.token) fetch('/api/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + s.token } }).catch(function(){});
+        clearSession();
+        window.location.replace('/');
+      }
+
+      // Sidebar sign-out button (injected after sidebar profile row)
+      var profileRow = $('profileButton');
+      if (profileRow && profileRow.parentNode) {
+        var signOutBtn = document.createElement('button');
+        signOutBtn.id = 'signOutBtn';
+        signOutBtn.style.cssText = 'display:none;margin:.25rem .75rem 0;width:calc(100% - 1.5rem);background:none;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45);border-radius:8px;padding:.35rem;font-size:.75rem;cursor:pointer;font-family:inherit;text-align:center';
+        signOutBtn.textContent = 'Sign out';
+        signOutBtn.addEventListener('click', function(e) { e.stopPropagation(); signOut(); });
+        profileRow.parentNode.insertBefore(signOutBtn, profileRow.nextSibling);
+      }
+
+      // ---------- Paint logged-in / logged-out state (header + sidebar) ----------
+      function initials(name, email) {
+        var base = (name || email || 'FL').trim();
+        var parts = base.split(/\s+/).slice(0, 2).map(function(p){ return p[0]; }).join('');
+        return (parts || base.slice(0, 2)).toUpperCase();
+      }
+      function paintUser() {
+      var session = getSession();
+        var authActions = $('lpAuthActions'), userBox = $('lpUser');
+      if (session && session.user) {
+        var u = session.user;
+          if (authActions) authActions.hidden = true;
+          if (userBox) userBox.hidden = false;
+          var av = $('lpAvatar');
+          if (av) {
+            if (u.avatar) { av.classList.add('has-img'); av.innerHTML = '<img src="' + u.avatar + '" alt="" referrerpolicy="no-referrer">'; }
+            else { av.classList.remove('has-img'); av.textContent = initials(u.name, u.email); }
+          }
+          if ($('lpUserName')) $('lpUserName').textContent = u.name || 'My foodlog';
+          if ($('lpUserEmail')) $('lpUserEmail').textContent = u.email || '';
+          // sidebar
+          if ($('sidebarProfileName')) $('sidebarProfileName').textContent = u.name || u.email || 'My foodlog';
+          var avatarEl = $('sidebarAvatar');
+          if (avatarEl && u.avatar) { avatarEl.style.cssText = 'width:36px;height:36px;border-radius:50%;overflow:hidden;padding:0;flex-shrink:0'; avatarEl.innerHTML = '<img src="' + u.avatar + '" style="width:100%;height:100%;object-fit:cover" referrerpolicy="no-referrer">'; }
+          var so = $('signOutBtn'); if (so) so.style.display = 'block';
+        } else {
+          if (authActions) authActions.hidden = false;
+          if (userBox) userBox.hidden = true;
+        }
+      }
+      paintUser();
+
+      // Header avatar dropdown
+      var avatarBtn = $('lpAvatar'), avatarMenu = $('lpAvatarMenu');
+      if (avatarBtn && avatarMenu) {
+        avatarBtn.addEventListener('click', function(e){ e.stopPropagation(); avatarMenu.hidden = !avatarMenu.hidden; });
+        document.addEventListener('click', function(e){ if (!avatarMenu.hidden && !e.target.closest('.lp-avatar-wrap')) avatarMenu.hidden = true; });
+      }
+      if ($('lpSignOut')) $('lpSignOut').addEventListener('click', signOut);
+
+      // Deep-link: /?auth=login or /?auth=signup (used by the food library header)
+      try {
+        var authParam = new URLSearchParams(location.search).get('auth');
+        if ((authParam === 'login' || authParam === 'signup') && !getSession()) {
+          openAuth(authParam === 'signup' ? 'register' : 'login');
+        }
+        if (authParam) history.replaceState(null, '', location.pathname);
+      } catch (e) {}
+
+      // PersonalOS OAuth connect: /app?connect=personalos&client_id=personalos&redirect_uri=...&state=...
+      (function personalosConnect() {
+        var params = new URLSearchParams(location.search);
+        if (params.get('connect') !== 'personalos') return;
+        var clientId = params.get('client_id') || 'personalos';
+        var redirectUri = params.get('redirect_uri') || '';
+        var state = params.get('state') || '';
+        if (!redirectUri) return;
+
+        window._personalosPendingConnect = { clientId: clientId, redirectUri: redirectUri, state: state };
+
+        function authorizeAndRedirect(token) {
+          fetch('/api/oauth/authorize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ client_id: clientId, redirect_uri: redirectUri, state: state })
+          }).then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+            .then(function(res){
+              if (!res.ok || res.d.error) throw new Error(res.d.error || 'Authorize failed');
+              var url = new URL(redirectUri);
+              url.searchParams.set('foodlog_code', res.d.code);
+              if (state) url.searchParams.set('state', state);
+              window.location.href = url.toString();
+            })
+            .catch(function(err){
+              alert(err.message || 'Could not connect PersonalOS');
+            });
+        }
+
+        function finishAuthorize() {
+          var session = getSession();
+          if (!session || !session.token) {
+            var note = document.createElement('div');
+            note.id = 'personalosConnectBanner';
+            note.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9999;background:#0f172a;color:#e2e8f0;border:1px solid rgba(16,185,129,.4);padding:14px 18px;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.45);max-width:420px;font:500 13px/1.4 Manrope,system-ui,sans-serif;';
+            note.innerHTML = '<strong style="color:#34d399">PersonalOS wants to connect</strong><div style="margin-top:6px;color:#94a3b8">Sign in to Foodlog, then we\'ll send you back to PersonalOS with your nutrition data linked.</div>';
+            document.body.appendChild(note);
+            openAuth('login');
+            return;
+          }
+          authorizeAndRedirect(session.token);
+        }
+
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', finishAuthorize);
+        else finishAuthorize();
+      })();
+    })();
+  </script>
+</body>
+</html>

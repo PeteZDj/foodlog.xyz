@@ -1,0 +1,23 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": [
+          "TEAMID.xyz.foodlog.app"
+        ],
+        "components": [
+          {
+            "/": "/*",
+            "comment": "Matches all Foodlog nutrition tracking, pricing, and account routes"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAMID.xyz.foodlog.app"
+    ]
+  }
+}

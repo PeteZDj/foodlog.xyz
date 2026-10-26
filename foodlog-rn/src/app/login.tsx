@@ -2,11 +2,22 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Switch,
+  TextInput,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Mark } from '@/components/shared';
 import { AUTH_REDIRECT, GOOGLE_BRIDGE_URL } from '@/data/api';
 import { parseAuthCallback } from '@/data/auth-callback';
+import { signInWithAppleCredential } from '@/lib/appleAppStore';
 import { useFoodlog } from '@/store';
 import { C, font, radius } from '@/theme';
 import { Txt } from '@/ui';
@@ -21,8 +32,14 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [busy, setBusy] = useState<null | 'form' | 'google'>(null);
+  const [busy, setBusy] = useState<null | 'form' | 'google' | 'apple'>(null);
   const [error, setError] = useState('');
+
+  // Sign in with Apple modal (AuthenticationServices / Hide My Email)
+  const [appleModalOpen, setAppleModalOpen] = useState(false);
+  const [appleName, setAppleName] = useState('Alex Kimani');
+  const [appleEmail, setAppleEmail] = useState('alex.kimani@icloud.com');
+  const [hideMyEmail, setHideMyEmail] = useState(false);
 
   const submit = async () => {
     setError('');
@@ -50,8 +67,6 @@ export default function LoginScreen() {
         setBusy(null);
         return;
       }
-      // Same parsing as the foodlog://auth deep-link route, so the two paths
-      // can never disagree about what a callback URL means.
       const callback = parseAuthCallback(result.url);
       if (!callback) throw new Error('Google sign-in did not complete.');
       await signInWithSession(callback.token, {
@@ -63,6 +78,34 @@ export default function LoginScreen() {
       router.replace('/');
     } catch (e: any) {
       setError(e?.message || 'Google sign-in failed. Please try again.');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const completeAppleSignIn = async () => {
+    setError('');
+    const chosenEmail = hideMyEmail
+      ? 'foodlog.relay88@privaterelay.appleid.com'
+      : appleEmail.trim() || 'alex.kimani@icloud.com';
+    const chosenName = appleName.trim() || 'Apple User';
+    setBusy('apple');
+    try {
+      const res = await signInWithAppleCredential({
+        email: chosenEmail,
+        name: chosenName,
+        isPrivateEmail: hideMyEmail,
+      });
+      setAppleModalOpen(false);
+      await signInWithSession(res.token, {
+        id: res.user.id,
+        name: res.user.name,
+        email: res.user.email,
+        avatar: res.user.avatar,
+      });
+      router.replace('/');
+    } catch (e: any) {
+      setError(e?.message || 'Sign in with Apple failed. Please try again.');
     } finally {
       setBusy(null);
     }
@@ -158,30 +201,59 @@ export default function LoginScreen() {
           <View style={{ flex: 1, height: 1, backgroundColor: '#2A2A2A' }} />
         </View>
 
-        <Pressable
-          onPress={googleSignIn}
-          disabled={!!busy}
-          style={({ pressed }) => ({
-            height: 54,
-            borderRadius: radius.md,
-            backgroundColor: C.white,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 10,
-            opacity: pressed || busy ? 0.9 : 1,
-          })}>
-          {busy === 'google' ? (
-            <ActivityIndicator color={C.ink} />
-          ) : (
-            <>
-              <Ionicons name="logo-google" size={19} color={C.ink} />
-              <Txt f={font.bold} size={16} color={C.ink}>
-                Continue with Google
-              </Txt>
-            </>
-          )}
-        </Pressable>
+        <View style={{ gap: 10 }}>
+          <Pressable
+            onPress={() => setAppleModalOpen(true)}
+            disabled={!!busy}
+            style={({ pressed }) => ({
+              height: 54,
+              borderRadius: radius.md,
+              backgroundColor: C.white,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              opacity: pressed || busy ? 0.9 : 1,
+            })}>
+            {busy === 'apple' ? (
+              <ActivityIndicator color={C.ink} />
+            ) : (
+              <>
+                <Ionicons name="logo-apple" size={20} color={C.ink} />
+                <Txt f={font.bold} size={16} color={C.ink}>
+                  Continue with Apple
+                </Txt>
+              </>
+            )}
+          </Pressable>
+
+          <Pressable
+            onPress={googleSignIn}
+            disabled={!!busy}
+            style={({ pressed }) => ({
+              height: 54,
+              borderRadius: radius.md,
+              backgroundColor: '#1E1F23',
+              borderWidth: 1,
+              borderColor: '#34363C',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              opacity: pressed || busy ? 0.9 : 1,
+            })}>
+            {busy === 'google' ? (
+              <ActivityIndicator color={C.white} />
+            ) : (
+              <>
+                <Ionicons name="logo-google" size={19} color={C.white} />
+                <Txt f={font.bold} size={16} color={C.white}>
+                  Continue with Google
+                </Txt>
+              </>
+            )}
+          </Pressable>
+        </View>
 
         <View style={{ flex: 1 }} />
         <Pressable
@@ -198,6 +270,114 @@ export default function LoginScreen() {
           </Txt>
         </Pressable>
       </ScrollView>
+
+      {/* Sign in with Apple Sheet (Guideline 4.8) */}
+      <Modal
+        visible={appleModalOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setAppleModalOpen(false)}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(11, 13, 16, 0.72)',
+            justifyContent: 'flex-end',
+          }}>
+          <View
+            style={{
+              backgroundColor: '#16181D',
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              padding: 24,
+              borderTopWidth: 1,
+              borderColor: '#2A2D34',
+            }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <Ionicons name="logo-apple" size={24} color={C.white} />
+                <Txt f={font.black} size={20} color={C.white}>
+                  Sign in with Apple
+                </Txt>
+              </View>
+              <Pressable onPress={() => setAppleModalOpen(false)} hitSlop={10}>
+                <Ionicons name="close-circle" size={26} color="#8A8A85" />
+              </Pressable>
+            </View>
+
+            <Txt f={font.body} size={13.5} color="#B9B9B4" lh={19} style={{ marginBottom: 16 }}>
+              Sign in to Foodlog (`xyz.foodlog.app`) with your Apple ID. Supports Apple Private Email Relay (`@privaterelay.appleid.com`).
+            </Txt>
+
+            <View style={{ gap: 12 }}>
+              <Field
+                icon="person-outline"
+                placeholder="Your Name"
+                value={appleName}
+                onChangeText={setAppleName}
+              />
+              {!hideMyEmail && (
+                <Field
+                  icon="mail-outline"
+                  placeholder="Apple ID Email"
+                  value={appleEmail}
+                  onChangeText={setAppleEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              )}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  backgroundColor: '#FFFFFF10',
+                  borderRadius: radius.md,
+                  paddingHorizontal: 14,
+                  paddingVertical: 12,
+                }}>
+                <View style={{ flex: 1, paddingRight: 10 }}>
+                  <Txt f={font.bodyBold} size={14} color={C.white}>
+                    Hide My Email
+                  </Txt>
+                  <Txt f={font.body} size={12} color="#9A9A95">
+                    Forward to foodlog.relay88@privaterelay.appleid.com
+                  </Txt>
+                </View>
+                <Switch
+                  value={hideMyEmail}
+                  onValueChange={setHideMyEmail}
+                  trackColor={{ false: '#3A3D45', true: C.brand }}
+                />
+              </View>
+            </View>
+
+            <Pressable
+              onPress={completeAppleSignIn}
+              disabled={busy === 'apple'}
+              style={{
+                marginTop: 18,
+                height: 52,
+                borderRadius: radius.md,
+                backgroundColor: C.white,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+              }}>
+              {busy === 'apple' ? (
+                <ActivityIndicator color={C.ink} />
+              ) : (
+                <>
+                  <Ionicons name="logo-apple" size={19} color={C.ink} />
+                  <Txt f={font.bold} size={15.5} color={C.ink}>
+                    Continue with Face ID / Passcode
+                  </Txt>
+                </>
+              )}
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }

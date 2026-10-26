@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foodlog for iPhone &amp; iOS — Instant Web App &amp; .IPA Download</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Foodlog" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #F6F5F1;
+      --ink: #0B0D10;
+      --card: #FFFFFF;
+      --line: #E6E4DD;
+      --muted: #65676B;
+      --brand: #1E6F50;
+      --brand-light: #E8F5EE;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(246, 245, 241, 0.92);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .nav {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -0.6px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .nav-links a.cta {
+      background: var(--ink);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 999px;
+    }
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 800;
+      letter-spacing: -1.4px;
+      line-height: 1.08;
+      margin-bottom: 16px;
+    }
+    .lead {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 680px;
+      margin-bottom: 36px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card.dark {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--brand-light);
+      color: var(--brand);
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .card.dark .tag {
+      background: rgba(255,255,255,0.14);
+      color: #A7F3D0;
+    }
+    .card h2 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+    .steps {
+      list-style: none;
+      margin: 18px 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .steps li {
+      display: flex;
+      gap: 12px;
+      font-size: 14.5px;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 15px 22px;
+      border-radius: 14px;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.92; }
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+    }
+    .btn-light {
+      background: #fff;
+      color: var(--ink);
+    }
+    .btn-outline {
+      border: 1px solid rgba(255,255,255,0.24);
+      color: #fff;
+      margin-top: 10px;
+    }
+    .specs {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 16px 0 22px;
+      font-size: 13.5px;
+    }
+    .specs-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .specs-row:last-child { border-bottom: none; }
+    .compliance {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+    }
+    .compliance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .compliance-item {
+      background: var(--bg);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .compliance-item h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .compliance-item p {
+      font-size: 13px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <a href="/" class="logo">foodlog</a>
+      <div class="nav-links">
+        <a href="/pricing">Pricing</a>
+        <a href="/downloads/foodlog-android.apk?v=1.6.0">Android APK</a>
+        <a href="/app" class="cta">Open Web App</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="badge"> Foodlog for iPhone &amp; iPad · v1.6.0 (Build 7)</div>
+    <h1>Foodlog on your iPhone.</h1>
+    <p class="lead">
+      Install Foodlog directly to your iPhone Home Screen in 10 seconds with full-screen standalone mode, or download the compiled iOS <code>.ipa</code> bundle for AltStore, Sideloadly, and TestFlight.
+    </p>
+
+    <div class="grid">
+      <div class="card">
+        <div>
+          <span class="tag">Recommended · Instant Install</span>
+          <h2>Install iPhone Web App (PWA)</h2>
+          <p style="color: var(--muted); font-size: 14.5px;">
+            Works on every iPhone &amp; iPad running iOS 15+ with zero certificates or computer required.
+          </p>
+          <ul class="steps">
+            <li>
+              <span class="step-num">1</span>
+              <span>Open <strong>foodlog.xyz/app</strong> in <strong>Safari</strong> on your iPhone.</span>
+            </li>
+            <li>
+              <span class="step-num">2</span>
+              <span>Tap the <strong>Share</strong> button at the bottom of Safari.</span>
+            </li>
+            <li>
+              <span class="step-num">3</span>
+              <span>Tap <strong>"Add to Home Screen"</strong> and tap <strong>Add</strong>.</span>
+            </li>
+          </ul>
+        </div>
+        <a href="/app" class="btn btn-primary">Launch Foodlog Web App →</a>
+      </div>
+
+      <div class="card dark">
+        <div>
+          <span class="tag">Native iOS Package · v1.6.0</span>
+          <h2>Download iOS .IPA Package</h2>
+          <p style="color: #B9B9B4; font-size: 14.5px;">
+            Pre-compiled React Native iOS Hermes bundle (<code>xyz.foodlog.app</code>) with Sign in with Apple, StoreKit 2 IAP, and Apple Pay.
+          </p>
+          <div class="specs">
+            <div class="specs-row">
+              <span style="color:#9A9A95">Bundle Identifier</span>
+              <strong style="font-family:'DM Mono',monospace">xyz.foodlog.app</strong>
+            </div>
+            <div class="specs-row">
+              <span style="color:#9A9A95">Version / Build</span>
+              <strong>1.6.0 (Build 7)</strong>
+            </div>
+            <div class="specs-row">
+              <span style="color:#9A9A95">Privacy Manifest</span>
+              <strong style="color:#6EE7B7">PrivacyInfo.xcprivacy Included</strong>
+            </div>
+            <div class="specs-row">
+              <span style="color:#9A9A95">Universal Links</span>
+              <strong style="color:#6EE7B7">/.well-known/apple-app-site-association</strong>
+            </div>
+          </div>
+        </div>
+        <div>
+          <a href="/downloads/foodlog-ios.ipa" download class="btn btn-light" style="width:100%">
+             Download foodlog-ios.ipa
+          </a>
+          <a href="/downloads/foodlog-android.apk?v=1.6.0" class="btn btn-outline" style="width:100%">
+            Switching to Android? Download APK v1.6.0
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="compliance">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">
+        Apple App Store Review Guidelines Compliance
+      </div>
+      <h2 style="margin-top:6px;font-size:22px;font-weight:800;">Built for Apple App Store Standards</h2>
+      <div class="compliance-grid">
+        <div class="compliance-item">
+          <h3>Sign in with Apple (4.8)</h3>
+          <p>Native Apple ID sign-in with full support for Hide My Email private relay addresses.</p>
+        </div>
+        <div class="compliance-item">
+          <h3>StoreKit 2 &amp; Apple Pay (3.1.1)</h3>
+          <p>AI Photo Scan Passes support App Store In-App Purchase (StoreKit 2) and Apple Pay (PassKit).</p>
+        </div>
+        <div class="compliance-item">
+          <h3>PrivacyInfo.xcprivacy</h3>
+          <p>Declares required-reason APIs (CA92.1, C617.1, 35F9.1, E174.1) and zero cross-app tracking.</p>
+        </div>
+        <div class="compliance-item">
+          <h3>Account Deletion (5.1.1v)</h3>
+          <p>Immediate in-app and web account &amp; data deletion at <a href="/delete-account" style="color:var(--brand)">/delete-account</a>.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

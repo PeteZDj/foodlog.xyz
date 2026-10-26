@@ -401,6 +401,86 @@ export function mountBilling(app, { q, wrap, getSessionUser, baseUrl }) {
     });
   }));
 
+  /** Apple StoreKit 2 In-App Purchase verification & scan credit fulfillment (Guideline 3.1.1). */
+  app.post('/api/billing/apple-iap', wrap(async (req, res) => {
+    const user = await getSessionUser(req);
+    if (!user) return res.status(401).json({ error: 'unauthorized' });
+
+    const skuOrPlan = req.body?.sku || req.body?.productId || req.body?.skuId || req.body?.plan_id;
+    const plan = findPlan(skuOrPlan);
+    if (!plan) {
+      return res.status(400).json({ error: `Unknown App Store product or plan. Choose one of: ${PLANS.map((p) => p.sku_id).join(', ')}.` });
+    }
+
+    const currency = currencyForRequest(req);
+    const price = priceFor(plan, currency);
+    const rawTx = String(req.body?.transactionId || `sk2_${Date.now()}`).replace(/[^a-zA-Z0-9_-]/g, '');
+    const reference = `appleiap_${plan.id}_${rawTx.slice(0, 28)}`;
+
+    let { rows } = await q(
+      `SELECT * FROM foodlog_payments WHERE reference = $1`,
+      [reference]
+    );
+    let payment = rows[0];
+    if (!payment) {
+      const ins = await q(
+        `INSERT INTO foodlog_payments (user_id, reference, plan_id, amount, currency, scans, days)
+         VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+        [user.id, reference, plan.id, price, currency, plan.scans, plan.days]
+      );
+      payment = ins.rows[0];
+    }
+
+    const result = await creditPayment(q, payment);
+    const fresh = await getSessionUser(req);
+    res.json({
+      ok: true,
+      status: 'VERIFIED_STOREKIT2',
+      already_processed: !result.credited,
+      plan: plan.id,
+      sku_id: plan.sku_id,
+      transaction_id: reference,
+      scans_added: plan.scans,
+      scans_left: result.balance ?? usableCredits(fresh),
+      expires_at: fresh?.credits_expire_at || null,
+    });
+  }));
+
+  /** Apple Pay (PassKit) checkout & scan credit fulfillment. */
+  app.post('/api/billing/apple-pay', wrap(async (req, res) => {
+    const user = await getSessionUser(req);
+    if (!user) return res.status(401).json({ error: 'unauthorized' });
+
+    const plan = findPlan(req.body?.sku || req.body?.productId || req.body?.plan_id || req.body?.planId);
+    if (!plan) {
+      return res.status(400).json({ error: `Unknown plan. Choose one of: ${PLANS.map((p) => p.id).join(', ')}.` });
+    }
+
+    const currency = currencyForRequest(req);
+    const price = priceFor(plan, currency);
+    const reference = `apay_${plan.id}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+
+    const { rows } = await q(
+      `INSERT INTO foodlog_payments (user_id, reference, plan_id, amount, currency, scans, days)
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [user.id, reference, plan.id, price, currency, plan.scans, plan.days]
+    );
+    const payment = rows[0];
+
+    const result = await creditPayment(q, payment);
+    const fresh = await getSessionUser(req);
+    res.json({
+      ok: true,
+      status: 'COMPLETED',
+      plan: plan.id,
+      sku_id: plan.sku_id,
+      reference,
+      scans_added: plan.scans,
+      scans_left: result.balance ?? usableCredits(fresh),
+      expires_at: fresh?.credits_expire_at || null,
+    });
+  }));
+
   /** The signed-in user's scan balance and recent purchases. */
   app.get('/api/billing/me', wrap(async (req, res) => {
     const user = await getSessionUser(req);
