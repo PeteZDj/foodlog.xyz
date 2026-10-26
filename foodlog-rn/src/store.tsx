@@ -24,6 +24,7 @@ import {
 import { FOODS } from '@/data/foods';
 import { api, ApiUser } from '@/data/api';
 import { mergeFoodlogState } from '@/data/merge';
+import { recordPositiveMilestoneAndMaybeReview } from '@/lib/googlePlay';
 import { todayKey, uid } from '@/util';
 
 const STATE_KEY = 'foodlog_state_v2';
@@ -34,6 +35,7 @@ export interface User {
   name: string;
   email: string;
   avatar?: string;
+  scan_credits?: number;
 }
 
 interface Auth {
@@ -82,6 +84,7 @@ interface Ctx {
   login: (email: string, password: string) => Promise<void>;
   signInWithSession: (token: string, user: User) => Promise<void>;
   logout: () => void;
+  deleteAccount: () => Promise<void>;
   completeOnboarding: (profile: Partial<Profile>, goals: Partial<Goals>) => void;
 
   state: FoodlogState;
@@ -142,12 +145,14 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
             if (!me.user) {
               await clearAuth();
             } else {
-              // Keep Google avatar fresh from /me
-              if (me.user.avatar && me.user.avatar !== savedAuth.user.avatar) {
-                const patched = { ...savedAuth, user: { ...savedAuth.user, ...me.user, avatar: me.user.avatar } };
-                setAuth(patched);
-                AsyncStorage.setItem(AUTH_KEY, JSON.stringify(patched)).catch(() => {});
-              }
+              // Keep Google avatar & scan_credits fresh from /me
+              const patched = {
+                ...savedAuth,
+                user: { ...savedAuth.user, ...me.user, avatar: me.user.avatar || savedAuth.user.avatar },
+              };
+              setAuth(patched);
+              AsyncStorage.setItem(AUTH_KEY, JSON.stringify(patched)).catch(() => {});
+
               const remote = await api.getState(savedAuth.token);
               if (remote.state) {
                 const local = stateRef.current;
@@ -225,7 +230,13 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
   }, [scheduleServerPush]);
 
   const applyAuth = useCallback(async (result: { token: string; user: ApiUser }) => {
-    const user: User = { id: result.user.id, name: result.user.name, email: result.user.email, avatar: result.user.avatar };
+    const user: User = {
+      id: result.user.id,
+      name: result.user.name,
+      email: result.user.email,
+      avatar: result.user.avatar,
+      scan_credits: result.user.scan_credits,
+    };
     const nextAuth: Auth = { token: result.token, user };
     setAuth(nextAuth);
     authRef.current = nextAuth;
@@ -259,7 +270,7 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
   }, [applyAuth]);
 
   const signInWithSession = useCallback(async (token: string, user: User) => {
-    await applyAuth({ token, user: { id: user.id || '', name: user.name, email: user.email, avatar: user.avatar } });
+    await applyAuth({ token, user: { id: user.id || '', name: user.name, email: user.email, avatar: user.avatar, scan_credits: user.scan_credits } });
   }, [applyAuth]);
 
   const logout = useCallback(() => {
@@ -267,6 +278,15 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
     if (tok) api.logout(tok).catch(() => {});
     if (syncTimer.current) clearTimeout(syncTimer.current);
     clearAuth();
+  }, [clearAuth]);
+
+  const deleteAccount = useCallback(async () => {
+    const tok = authRef.current?.token;
+    if (syncTimer.current) clearTimeout(syncTimer.current);
+    if (tok) {
+      await api.deleteAccount(tok, 'DELETE');
+    }
+    await clearAuth();
   }, [clearAuth]);
 
   const completeOnboarding = useCallback((profilePatch: Partial<Profile>, goalsPatch: Partial<Goals>) => {
@@ -305,7 +325,10 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
   );
 
   const addItem = useCallback(
-    (key: string, item: FoodItem) => mutateDay(key, (d) => ({ ...d, items: [...d.items, item] })),
+    (key: string, item: FoodItem) => {
+      mutateDay(key, (d) => ({ ...d, items: [...d.items, item] }));
+      recordPositiveMilestoneAndMaybeReview('AI Photo Scan Logged').catch(() => {});
+    },
     [mutateDay],
   );
 
@@ -337,6 +360,7 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
         recentFoodIds: recents,
         entries: { ...stateRef.current.entries, [key]: { water: day.water, items: [...day.items, item] } },
       });
+      recordPositiveMilestoneAndMaybeReview('Meal Logged').catch(() => {});
     },
     [persist],
   );
@@ -403,6 +427,7 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
       login,
       signInWithSession,
       logout,
+      deleteAccount,
       completeOnboarding,
       state,
       goals: state.goals,
@@ -423,7 +448,7 @@ export function FoodlogProvider({ children }: { children: React.ReactNode }) {
       addCustomFood,
       recentFoods,
     }),
-    [ready, auth, state, syncing, register, login, signInWithSession, logout, completeOnboarding, getDay, totalsFor, loggedDayKeys, logFood, addItem, updateItem, removeItem, setWater, setGoals, setProfile, addWeight, addExercise, addCustomFood, recentFoods],
+    [ready, auth, state, syncing, register, login, signInWithSession, logout, deleteAccount, completeOnboarding, getDay, totalsFor, loggedDayKeys, logFood, addItem, updateItem, removeItem, setWater, setGoals, setProfile, addWeight, addExercise, addCustomFood, recentFoods],
   );
 
   return <FoodlogContext.Provider value={value}>{children}</FoodlogContext.Provider>;

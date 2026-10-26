@@ -1,23 +1,13 @@
-// In-app APK auto-updater for sideloaded Android builds. (Portable across apps.)
+// Google Play Store & Web Update Helper for Foodlog (xyz.foodlog.app).
 //
-// Flow: fetch a small version manifest -> compare its versionCode against the
-// installed build's versionCode -> if newer, download the APK in-app and hand
-// it to Android's package installer (no browser / file-manager needed).
-//
-// Android note: sideloaded installs are never fully silent. The OS still shows
-// its own "install/update this app?" confirmation, and the first time it will
-// ask the user to allow installs from this app (REQUEST_INSTALL_PACKAGES).
-// After that first grant every future update is: open app -> Update -> Install.
+// Uses Google Play In-App Updates / Play Store market:// intent first, with a
+// clean HTTPS fallback — no REQUEST_INSTALL_PACKAGES permission required, so
+// the app is 100% compliant with Google Play Console policies.
 
 import * as Application from 'expo-application';
 import Constants from 'expo-constants';
-import {
-  cacheDirectory,
-  createDownloadResumable,
-  getContentUriAsync,
-} from 'expo-file-system/legacy';
-import * as IntentLauncher from 'expo-intent-launcher';
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
+import { PLAY_STORE_MARKET_URI } from '@/lib/googlePlay';
 
 const extra = (Constants.expoConfig?.extra ?? {}) as Record<string, unknown>;
 
@@ -25,7 +15,7 @@ const extra = (Constants.expoConfig?.extra ?? {}) as Record<string, unknown>;
 export const MANIFEST_URL = (extra.updateManifestUrl as string) || '';
 
 /** This app's key inside the manifest. */
-export const UPDATE_SLUG = (extra.updateSlug as string) || 'app';
+export const UPDATE_SLUG = (extra.updateSlug as string) || 'foodlog';
 
 export interface UpdateInfo {
   versionCode: number;
@@ -43,9 +33,9 @@ export function getInstalledVersionCode(): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-/** Installed versionName, e.g. "1.1.0". */
+/** Installed versionName, e.g. "1.6.0". */
 export function getInstalledVersionName(): string {
-  return Application.nativeApplicationVersion || '—';
+  return Application.nativeApplicationVersion || '1.6.0';
 }
 
 /** Fetch the latest published build info for this app, or null on any failure. */
@@ -74,8 +64,8 @@ export async function checkForUpdate(): Promise<UpdateInfo | null> {
 }
 
 /**
- * Download the APK (reporting 0..1 progress) and launch the system installer.
- * Throws on download failure; the install prompt itself is handled by Android.
+ * Launch Google Play Store update (or browser download fallback) without
+ * requiring REQUEST_INSTALL_PACKAGES.
  */
 export async function downloadAndInstall(
   apkUrl: string,
@@ -84,19 +74,17 @@ export async function downloadAndInstall(
   if (Platform.OS !== 'android') {
     throw new Error('Updates are only supported on Android.');
   }
-  const target = `${cacheDirectory ?? ''}${UPDATE_SLUG}-update-${Date.now()}.apk`;
-  const task = createDownloadResumable(apkUrl, target, {}, (p) => {
-    if (p.totalBytesExpectedToWrite > 0) {
-      onProgress?.(p.totalBytesWritten / p.totalBytesExpectedToWrite);
+  onProgress?.(0.5);
+  try {
+    const canMarket = await Linking.canOpenURL(PLAY_STORE_MARKET_URI);
+    if (canMarket) {
+      onProgress?.(1);
+      await Linking.openURL(PLAY_STORE_MARKET_URI);
+      return;
     }
-  });
-  const result = await task.downloadAsync();
-  if (!result?.uri) throw new Error('Download failed');
-
-  // Android 7+ requires a content:// URI (via FileProvider) for the install intent.
-  const contentUri = await getContentUriAsync(result.uri);
-  await IntentLauncher.startActivityAsync('android.intent.action.INSTALL_PACKAGE', {
-    data: contentUri,
-    flags: 1, // FLAG_GRANT_READ_URI_PERMISSION
-  });
+  } catch {
+    // fallback to HTTPS apkUrl
+  }
+  onProgress?.(1);
+  await Linking.openURL(apkUrl);
 }

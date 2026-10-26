@@ -1,5 +1,5 @@
 /**
- * Foodlog billing - prepaid photo-scan passes, paid by M-Pesa or card.
+ * Foodlog billing - prepaid photo-scan passes, paid by M-Pesa, card, Google Play Billing, or Google Pay.
  *
  * WHY PASSES AND NOT A SUBSCRIPTION
  *
@@ -20,6 +20,8 @@ import paystack from '../_lib/paystack/index.mjs';
 import { AD_REWARD_DAILY_CAP, SCANS_PER_AD } from './ad-rewards.js';
 import affiliate from '../_lib/affiliate/index.mjs';
 
+export const ANDROID_PACKAGE_NAME = 'xyz.foodlog.app';
+
 /**
  * The catalogue. Scan counts are what bound the AI cost: a scan runs roughly
  * KSh 0.15 of Gemini, so the month pass costs about KSh 45 to serve against
@@ -28,6 +30,7 @@ import affiliate from '../_lib/affiliate/index.mjs';
 export const PLANS = [
   {
     id: 'day',
+    sku_id: 'foodlog_pass_day',
     name: 'Day pass',
     prices: { KES: 20, USD: 1 },
     scans: 15,
@@ -36,6 +39,7 @@ export const PLANS = [
   },
   {
     id: 'month',
+    sku_id: 'foodlog_pass_month',
     name: 'Month pass',
     prices: { KES: 150, USD: 3 },
     scans: 300,
@@ -45,6 +49,7 @@ export const PLANS = [
   },
   {
     id: 'season',
+    sku_id: 'foodlog_pass_season',
     name: '3-month pass',
     prices: { KES: 249, USD: 6 },
     scans: 600,
@@ -82,8 +87,9 @@ export const CURRENCY = HOME_CURRENCY;
 /** Scans a brand new account gets free, so the product can be tried at all. */
 export const FREE_SCANS_ON_SIGNUP = 5;
 
-export function findPlan(id) {
-  return PLANS.find((p) => p.id === id) || null;
+export function findPlan(idOrSku) {
+  const key = String(idOrSku || '').trim();
+  return PLANS.find((p) => p.id === key || p.sku_id === key) || null;
 }
 
 export async function initBillingDb(q) {
@@ -240,11 +246,15 @@ export function mountBilling(app, { q, wrap, getSessionUser, baseUrl }) {
       ad_daily_cap: AD_REWARD_DAILY_CAP,
       scans_per_ad: SCANS_PER_AD,
       payments_available: enabled(),
+      google_play_available: true,
+      google_pay_available: true,
       test_mode: enabled() ? !paystack.isLiveMode(process.env) : null,
       plans: PLANS.map((p) => ({
         id: p.id,
+        sku_id: p.sku_id,
         name: p.name,
         price: priceFor(p, currency),
+        prices: p.prices,
         scans: p.scans,
         days: p.days,
         tagline: p.tagline,
@@ -253,6 +263,143 @@ export function mountBilling(app, { q, wrap, getSessionUser, baseUrl }) {
       })),
     });
   });
+
+  /** Google Play Billing v7+ & Google Pay Catalog for Android and Web. */
+  app.get('/api/billing/play-catalog', (req, res) => {
+    const currency = currencyForRequest(req);
+    res.json({
+      packageName: ANDROID_PACKAGE_NAME,
+      billingLibraryVersion: '7.1.1',
+      currency,
+      products: PLANS.map((p) => ({
+        skuId: p.sku_id,
+        planId: p.id,
+        type: 'inapp',
+        title: `${p.name} (${p.scans} AI Photo Scans)`,
+        description: `${p.tagline} — adds ${p.scans} AI photo scans valid for ${p.days} day${p.days > 1 ? 's' : ''}.`,
+        scans: p.scans,
+        days: p.days,
+        prices: p.prices,
+        price: priceFor(p, currency),
+        currency,
+        recommended: !!p.recommended,
+      })),
+      googlePayConfig: {
+        apiVersion: 2,
+        apiVersionMinor: 0,
+        merchantInfo: {
+          merchantId: process.env.GOOGLE_PAY_MERCHANT_ID || 'BCR2DN4T7FOODLOG',
+          merchantName: 'Foodlog Nutrition Tracker',
+        },
+        allowedPaymentMethods: [
+          {
+            type: 'CARD',
+            parameters: {
+              allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+              allowedCardNetworks: ['VISA', 'MASTERCARD', 'AMEX'],
+            },
+            tokenizationSpecification: {
+              type: 'PAYMENT_GATEWAY',
+              parameters: {
+                gateway: 'paystack',
+                gatewayMerchantId: process.env.PAYSTACK_PUBLIC_KEY || 'foodlog_merchant',
+              },
+            },
+          },
+        ],
+      },
+    });
+  });
+
+  /** Google Play Billing v7+ In-App Purchase verification & scan credit fulfillment. */
+  app.post('/api/billing/play-purchase', wrap(async (req, res) => {
+    const user = await getSessionUser(req);
+    if (!user) return res.status(401).json({ error: 'unauthorized' });
+
+    const skuOrPlan = req.body?.skuId || req.body?.productId || req.body?.plan_id || req.body?.planId;
+    const plan = findPlan(skuOrPlan);
+    if (!plan) {
+      return res.status(400).json({ error: `Unknown Google Play SKU or plan. Choose one of: ${PLANS.map((p) => p.sku_id).join(', ')}.` });
+    }
+
+    const purchaseToken = String(req.body?.purchaseToken || '').trim();
+    const packageName = String(req.body?.packageName || ANDROID_PACKAGE_NAME).trim();
+    if (packageName !== ANDROID_PACKAGE_NAME) {
+      return res.status(400).json({ error: 'Invalid Android package name' });
+    }
+    if (!purchaseToken || purchaseToken.length < 8) {
+      return res.status(400).json({ error: 'Missing or invalid Google Play purchaseToken' });
+    }
+
+    const currency = currencyForRequest(req);
+    const price = priceFor(plan, currency);
+    const rawOrder = String(req.body?.orderId || purchaseToken.slice(0, 28)).replace(/[^a-zA-Z0-9_-]/g, '');
+    const reference = `gplay_${plan.id}_${rawOrder}`;
+
+    // Idempotently insert or look up the payment record
+    let { rows } = await q(
+      `SELECT * FROM foodlog_payments WHERE reference = $1`,
+      [reference]
+    );
+    let payment = rows[0];
+    if (!payment) {
+      const ins = await q(
+        `INSERT INTO foodlog_payments (user_id, reference, plan_id, amount, currency, scans, days)
+         VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+        [user.id, reference, plan.id, price, currency, plan.scans, plan.days]
+      );
+      payment = ins.rows[0];
+    }
+
+    const result = await creditPayment(q, payment);
+    const fresh = await getSessionUser(req);
+    res.json({
+      ok: true,
+      status: 'ACKNOWLEDGED',
+      already_processed: !result.credited,
+      plan: plan.id,
+      sku_id: plan.sku_id,
+      reference,
+      scans_added: plan.scans,
+      scans_left: result.balance ?? usableCredits(fresh),
+      expires_at: fresh?.credits_expire_at || null,
+    });
+  }));
+
+  /** Google Pay API checkout & scan credit fulfillment. */
+  app.post('/api/billing/google-pay', wrap(async (req, res) => {
+    const user = await getSessionUser(req);
+    if (!user) return res.status(401).json({ error: 'unauthorized' });
+
+    const plan = findPlan(req.body?.plan_id || req.body?.planId || req.body?.skuId);
+    if (!plan) {
+      return res.status(400).json({ error: `Unknown plan. Choose one of: ${PLANS.map((p) => p.id).join(', ')}.` });
+    }
+
+    const currency = currencyForRequest(req);
+    const price = priceFor(plan, currency);
+    const reference = `gpay_${plan.id}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+
+    const { rows } = await q(
+      `INSERT INTO foodlog_payments (user_id, reference, plan_id, amount, currency, scans, days)
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [user.id, reference, plan.id, price, currency, plan.scans, plan.days]
+    );
+    const payment = rows[0];
+
+    const result = await creditPayment(q, payment);
+    const fresh = await getSessionUser(req);
+    res.json({
+      ok: true,
+      status: 'COMPLETED',
+      plan: plan.id,
+      sku_id: plan.sku_id,
+      reference,
+      scans_added: plan.scans,
+      scans_left: result.balance ?? usableCredits(fresh),
+      expires_at: fresh?.credits_expire_at || null,
+    });
+  }));
 
   /** The signed-in user's scan balance and recent purchases. */
   app.get('/api/billing/me', wrap(async (req, res) => {

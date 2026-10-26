@@ -1,60 +1,86 @@
 {
   "expo": {
     "name": "Foodlog",
-    "slug": "foodlog-rn",
-    "version": "1.5.0",
+    "slug": "foodlog",
+    "version": "1.6.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "foodlog",
     "userInterfaceStyle": "light",
-    "backgroundColor": "#F5F5F2",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F6F5F1"
+    },
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "xyz.foodlog.app"
+      "supportsTablet": false,
+      "bundleIdentifier": "xyz.foodlog.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Foodlog uses your camera so you can snap a photo of your plate to log meals.",
+        "NSPhotoLibraryUsageDescription": "Foodlog uses your photo library so you can attach meal photos to your log."
+      }
     },
     "android": {
       "package": "xyz.foodlog.app",
-      "versionCode": 6,
+      "versionCode": 7,
       "adaptiveIcon": {
-        "backgroundColor": "#17643A",
-        "foregroundImage": "./assets/images/adaptive-foreground.png"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B0D10"
       },
       "permissions": [
-        "android.permission.REQUEST_INSTALL_PACKAGES"
+        "android.permission.CAMERA",
+        "android.permission.INTERNET",
+        "android.permission.POST_NOTIFICATIONS",
+        "com.android.vending.BILLING"
       ],
-      "predictiveBackGestureEnabled": false
-    },
-    "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "blockedPermissions": [
+        "android.permission.REQUEST_INSTALL_PACKAGES",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "foodlog.xyz",
+              "pathPrefix": "/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.foodlog.xyz",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "plugins": [
       "expo-router",
       [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#0A0A0A",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 150
-        }
-      ],
-      "expo-image",
-      [
         "expo-image-picker",
         {
-          "photosPermission": "Foodlog uses your photos so you can log meals from pictures.",
-          "cameraPermission": "Foodlog uses the camera to scan and log your meals."
+          "photosPermission": "Allow Foodlog to access your photos to attach meal pictures.",
+          "cameraPermission": "Allow Foodlog to use your camera to photograph meals."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
-      "typedRoutes": false,
-      "reactCompiler": true
+      "typedRoutes": true
     },
     "extra": {
       "updateManifestUrl": "https://foodlog.xyz/downloads/versions.json",
       "updateSlug": "foodlog",
-      "updateAccent": "#2E9E5B"
+      "updateAccent": "#0B0D10"
     }
   }
 }

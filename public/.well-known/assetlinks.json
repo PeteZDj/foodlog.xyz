@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "xyz.foodlog.app",
+      "sha256_cert_fingerprints": [
+        "23:98:C8:DD:3D:A2:FF:D4:D1:E5:8E:EF:08:38:73:A8:86:A6:53:63:16:85:0F:B8:0C:C9:33:E9:E6:3D:E8:9A"
+      ]
+    }
+  }
+]

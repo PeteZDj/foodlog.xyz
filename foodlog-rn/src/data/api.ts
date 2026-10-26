@@ -16,6 +16,7 @@ export interface ApiUser {
   email: string;
   name: string;
   avatar?: string;
+  scan_credits?: number;
 }
 
 export interface AuthResult {
@@ -59,13 +60,20 @@ export const api = {
 
   logout: (token: string) => req<{ ok: boolean }>('/api/auth/logout', { method: 'POST', token }),
 
+  deleteAccount: (token: string, confirmText = 'DELETE') =>
+    req<{ ok: boolean; deleted: boolean; message: string }>('/api/account/delete', {
+      method: 'POST',
+      token,
+      body: { confirmText },
+    }),
+
   getState: (token: string) => req<{ state: FoodlogState | null }>('/api/sync', { token }),
 
   putState: (token: string, state: FoodlogState) =>
     req<{ ok: boolean }>('/api/sync', { method: 'POST', token, body: { state } }),
 
   scan: (token: string, image: string) =>
-    req<{ items: ScanItem[]; summary: string }>('/api/scan', { method: 'POST', token, body: { image } }),
+    req<{ items: ScanItem[]; summary: string; scans_left?: number }>('/api/scan', { method: 'POST', token, body: { image } }),
 
   parse: (token: string, text: string) =>
     req<{ items: ParseItem[]; summary: string }>('/api/parse', { method: 'POST', token, body: { text } }),

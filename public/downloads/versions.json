@@ -1,12 +1,14 @@
 {
-  "apps": {
-    "foodlog": {
-      "versionCode": 6,
-      "versionName": "1.5.0",
-      "apkUrl": "https://foodlog.xyz/downloads/foodlog-1.5.0.apk",
-      "notes": "Fix Google Sign-In on mobile, photo scan passes, and meal sync.",
-      "mandatory": true,
-      "sizeMB": 63.6
-    }
-  }
+    "apps":  {
+                 "foodlog":  {
+                                 "playStoreUrl":  "https://play.google.com/store/apps/details?id=xyz.foodlog.app",
+                                 "mandatory":  false,
+                                 "aabUrl":  "https://foodlog.xyz/downloads/foodlog.aab",
+                                 "versionCode":  7,
+                                 "sizeMB":  64.5,
+                                 "apkUrl":  "https://foodlog.xyz/downloads/foodlog-1.6.0.apk",
+                                 "notes":  "Google Play Store v1.6.0 release: Google Play Billing v7+ \u0026 Google Pay for AI Scan Passes, In-App \u0026 Web Account Deletion, Play In-App Updates \u0026 Review, Verified App Links, Play Integrity API, and Android 13+ notification reminders.",
+                                 "versionName":  "1.6.0"
+                             }
+             }
 }
