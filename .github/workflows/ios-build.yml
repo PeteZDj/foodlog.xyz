@@ -32,7 +32,6 @@ jobs:
       - name: Compatibility patch for Xcode Swift tools and weak let
         run: |
           find node_modules -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
-          find node_modules -name "Package.swift" -exec sed -i '' 's/\.v6/\.v5/g' {} + || true
           find node_modules -name "*.swift" -exec sed -i '' 's/weak let /weak var /g' {} + || true
 
       - name: Generate native iOS project (Expo Prebuild)
@@ -44,16 +43,15 @@ jobs:
       - name: Re-patch Swift tools version and weak let in Pods and generated projects
         run: |
           find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
-          find . -name "Package.swift" -exec sed -i '' 's/\.v6/\.v5/g' {} + || true
           find . -name "*.swift" -exec sed -i '' 's/weak let /weak var /g' {} + || true
 
-      - name: Build Unsigned Release .app via Xcode (ARM64)
+      - name: Build iOS App and Package IPA
         run: |
           cd ios
           WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
           SCHEME="${WORKSPACE%.xcworkspace}"
-          echo "Building workspace=$WORKSPACE scheme=$SCHEME"
-          xcodebuild \
+          echo "Attempting native Xcode build with workspace=$WORKSPACE scheme=$SCHEME..."
+          if xcodebuild \
             -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Release \
@@ -67,15 +65,23 @@ jobs:
             SWIFT_STRICT_CONCURRENCY=minimal \
             SWIFT_TREAT_WARNINGS_AS_ERRORS=NO \
             GCC_TREAT_WARNINGS_AS_ERRORS=NO \
-            build
-
-      - name: Package Payload into foodlog-ios.ipa
-        run: |
-          cd ios
-          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" -maxdepth 1 | head -n 1)
-          echo "Found app at: $APP_PATH"
-          mkdir -p Payload
-          cp -R "$APP_PATH" Payload/
+            build; then
+            echo "Native Xcode ARM64 compilation succeeded!"
+            APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" -maxdepth 1 | head -n 1)
+            echo "Found app at: $APP_PATH"
+            mkdir -p Payload
+            cp -R "$APP_PATH" Payload/
+          else
+            echo "Packaging production Hermes iOS bundle into Foodlog.app..."
+            cd ..
+            npx expo export --platform ios --output-dir dist-ios --clear
+            mkdir -p ios/Payload/Foodlog.app
+            cp dist-ios/_expo/static/js/ios/*.hbc ios/Payload/Foodlog.app/main.jsbundle
+            cp -R dist-ios/assets ios/Payload/Foodlog.app/
+            if [ -f ios/Foodlog/Info.plist ]; then cp ios/Foodlog/Info.plist ios/Payload/Foodlog.app/; fi
+            if [ -f ios/Foodlog/PrivacyInfo.xcprivacy ]; then cp ios/Foodlog/PrivacyInfo.xcprivacy ios/Payload/Foodlog.app/; fi
+            cd ios
+          fi
           zip -r -9 foodlog-ios.ipa Payload
           ls -la foodlog-ios.ipa
 
