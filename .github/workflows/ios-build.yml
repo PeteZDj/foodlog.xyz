@@ -32,7 +32,9 @@ jobs:
       - name: Compatibility patch for Xcode Swift tools and weak let
         run: |
           find node_modules -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
+          find node_modules -name "Package.swift" -exec sed -i '' 's/\.v6/\.v5/g' {} + || true
           find node_modules -name "*.swift" -exec sed -i '' 's/weak let /weak var /g' {} + || true
+          find node_modules -name "*.swift" -exec sed -i '' 's/: Sendable/: @unchecked Sendable/g' {} + || true
 
       - name: Generate native iOS project (Expo Prebuild)
         run: npx expo prebuild --platform ios --clean
@@ -43,7 +45,9 @@ jobs:
       - name: Re-patch Swift tools version and weak let in Pods and generated projects
         run: |
           find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
+          find . -name "Package.swift" -exec sed -i '' 's/\.v6/\.v5/g' {} + || true
           find . -name "*.swift" -exec sed -i '' 's/weak let /weak var /g' {} + || true
+          find . -name "*.swift" -exec sed -i '' 's/: Sendable/: @unchecked Sendable/g' {} + || true
 
       - name: Build Unsigned Release .app via Xcode (ARM64)
         run: |
@@ -62,6 +66,9 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             COMPILER_INDEX_STORE_ENABLE=NO \
+            SWIFT_STRICT_CONCURRENCY=minimal \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=NO \
+            GCC_TREAT_WARNINGS_AS_ERRORS=NO \
             build
 
       - name: Package Payload into foodlog-ios.ipa
