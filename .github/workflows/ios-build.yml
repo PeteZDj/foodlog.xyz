@@ -29,9 +29,10 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Compatibility patch for Xcode Swift tools version
+      - name: Compatibility patch for Xcode Swift tools and weak let
         run: |
           find node_modules -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
+          find node_modules -name "*.swift" -exec sed -i '' 's/weak let /weak var /g' {} + || true
 
       - name: Generate native iOS project (Expo Prebuild)
         run: npx expo prebuild --platform ios --clean
@@ -39,9 +40,10 @@ jobs:
           EXPO_NO_GIT_STATUS: 1
           CI: '1'
 
-      - name: Re-patch Swift tools version in Pods and generated projects
+      - name: Re-patch Swift tools version and weak let in Pods and generated projects
         run: |
           find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
+          find . -name "*.swift" -exec sed -i '' 's/weak let /weak var /g' {} + || true
 
       - name: Build Unsigned Release .app via Xcode (ARM64)
         run: |
