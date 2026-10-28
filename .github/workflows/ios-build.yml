@@ -34,7 +34,6 @@ jobs:
           find node_modules -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
           find node_modules -name "Package.swift" -exec sed -i '' 's/\.v6/\.v5/g' {} + || true
           find node_modules -name "*.swift" -exec sed -i '' 's/weak let /weak var /g' {} + || true
-          find node_modules -name "*.swift" -exec sed -i '' 's/: Sendable/: @unchecked Sendable/g' {} + || true
 
       - name: Generate native iOS project (Expo Prebuild)
         run: npx expo prebuild --platform ios --clean
@@ -47,7 +46,6 @@ jobs:
           find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
           find . -name "Package.swift" -exec sed -i '' 's/\.v6/\.v5/g' {} + || true
           find . -name "*.swift" -exec sed -i '' 's/weak let /weak var /g' {} + || true
-          find . -name "*.swift" -exec sed -i '' 's/: Sendable/: @unchecked Sendable/g' {} + || true
 
       - name: Build Unsigned Release .app via Xcode (ARM64)
         run: |
