@@ -12,6 +12,7 @@ jobs:
   build-ios:
     name: Build iOS IPA on macOS Xcode
     runs-on: macos-15
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: foodlog-rn
@@ -20,46 +21,56 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
+
+      - name: Compatibility patch for Xcode Swift tools version
+        run: |
+          find node_modules -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
 
       - name: Generate native iOS project (Expo Prebuild)
         run: npx expo prebuild --platform ios --clean
         env:
           EXPO_NO_GIT_STATUS: 1
+          CI: '1'
 
-      - name: Install CocoaPods
+      - name: Re-patch Swift tools version in Pods and generated projects
+        run: |
+          find . -name "Package.swift" -exec sed -i '' 's/swift-tools-version: 6.2/swift-tools-version: 6.0/g' {} + || true
+
+      - name: Build Unsigned Release .app via Xcode (ARM64)
         run: |
           cd ios
-          pod install
-
-      - name: Build Unsigned Release .app via Xcode
-        run: |
-          WORKSPACE=$(ls -d ios/*.xcworkspace | head -n 1)
-          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          WORKSPACE=$(ls -d *.xcworkspace | head -n 1)
+          SCHEME="${WORKSPACE%.xcworkspace}"
+          echo "Building workspace=$WORKSPACE scheme=$SCHEME"
           xcodebuild \
             -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Release \
+            -destination "generic/platform=iOS" \
             -sdk iphoneos \
-            -derivedDataPath ios/build \
+            -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            DEVELOPMENT_TEAM="" \
+            COMPILER_INDEX_STORE_ENABLE=NO \
             build
 
       - name: Package Payload into foodlog-ios.ipa
         run: |
-          mkdir -p ios/ipa/Payload
-          cp -R ios/build/Build/Products/Release-iphoneos/*.app ios/ipa/Payload/
-          cd ios/ipa
-          zip -r -9 ../foodlog-ios.ipa Payload
+          cd ios
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" -maxdepth 1 | head -n 1)
+          echo "Found app at: $APP_PATH"
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r -9 foodlog-ios.ipa Payload
+          ls -la foodlog-ios.ipa
 
       - name: Upload foodlog-ios.ipa Artifact
         uses: actions/upload-artifact@v4
