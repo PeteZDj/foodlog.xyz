@@ -1,5 +1,5 @@
 // Foodlog Offline Cache & Service Worker for iPhone, iPad & Mobile Web
-const CACHE_NAME = 'foodlog-pwa-v1.6.0';
+const CACHE_NAME = 'foodlog-pwa-v1.6.1';
 const STATIC_ASSETS = [
   '/',
   '/app',
