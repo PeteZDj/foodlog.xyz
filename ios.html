@@ -2,348 +2,1043 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Foodlog for iPhone &amp; iOS — Instant Web App &amp; .IPA Download</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Foodlog for iPhone &amp; iPad — Instant Home Screen App &amp; iOS Download</title>
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Foodlog" />
   <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-  <link rel="apple-touch-icon" href="/icon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #F6F5F1;
-      --ink: #0B0D10;
-      --card: #FFFFFF;
-      --line: #E6E4DD;
-      --muted: #65676B;
+      --bg: #0B0D10;
+      --bg-card: #15181E;
+      --bg-card-alt: #1C2028;
+      --line: rgba(255, 255, 255, 0.1);
+      --line-bright: rgba(255, 255, 255, 0.2);
+      --ink: #FFFFFF;
+      --muted: #9BA1A6;
+      --muted-light: #C2C7CD;
       --brand: #1E6F50;
-      --brand-light: #E8F5EE;
+      --brand-glow: #2ECC71;
+      --brand-light: rgba(46, 204, 113, 0.15);
+      --accent-blue: #0A84FF;
+      --apple-gold: #F5D061;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--ink);
       line-height: 1.55;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* Floating Top-Right Pointer Beacon */
+    .top-right-beacon {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(21, 24, 30, 0.94);
+      border: 1px solid rgba(46, 204, 113, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 10px 16px;
+      border-radius: 999px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(46, 204, 113, 0.25);
+      animation: floatBeacon 3s ease-in-out infinite;
+    }
+    .beacon-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .beacon-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--brand-glow), var(--brand));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      animation: bounceTopRight 1.5s ease-in-out infinite;
+    }
+    @keyframes bounceTopRight {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(4px, -4px); }
+    }
+    @keyframes floatBeacon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
     header {
       border-bottom: 1px solid var(--line);
-      background: rgba(246, 245, 241, 0.92);
-      backdrop-filter: blur(10px);
+      background: rgba(11, 13, 16, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       position: sticky;
       top: 0;
-      z-index: 20;
+      z-index: 50;
     }
     .nav {
-      max-width: 1080px;
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 16px 24px;
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .app-icon-img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
     .logo {
       font-weight: 800;
-      font-size: 20px;
+      font-size: 21px;
       letter-spacing: -0.6px;
-      color: var(--ink);
-      text-decoration: none;
     }
-    .nav-links {
+    .nav-actions {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       align-items: center;
     }
-    .nav-links a {
+    .nav-link {
+      color: var(--muted-light);
       text-decoration: none;
-      color: var(--muted);
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13.5px;
+      padding: 6px 12px;
     }
-    .nav-links a.cta {
-      background: var(--ink);
+    .nav-btn-app {
+      background: linear-gradient(135deg, #2ECC71, #1E6F50);
       color: #fff;
-      padding: 9px 16px;
+      font-weight: 700;
+      font-size: 13.5px;
+      padding: 9px 18px;
       border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(46, 204, 113, 0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
     }
+    .nav-btn-app:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(46, 204, 113, 0.4);
+    }
+
     .container {
-      max-width: 1040px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding: 48px 24px 80px;
+      padding: 40px 20px 80px;
     }
-    .badge {
+
+    .hero-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      background: #fff;
-      border: 1px solid var(--line);
+      font-size: 12.5px;
+      background: var(--brand-light);
+      color: #6EE7B7;
+      border: 1px solid rgba(46, 204, 113, 0.3);
       padding: 6px 14px;
       border-radius: 999px;
       margin-bottom: 18px;
     }
     h1 {
-      font-size: clamp(32px, 5vw, 52px);
+      font-size: clamp(32px, 5vw, 50px);
       font-weight: 800;
-      letter-spacing: -1.4px;
-      line-height: 1.08;
-      margin-bottom: 16px;
+      letter-spacing: -1.2px;
+      line-height: 1.12;
+      margin-bottom: 14px;
     }
     .lead {
       font-size: 18px;
+      color: var(--muted-light);
+      max-width: 720px;
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    /* Option 1 Main Hero Card */
+    .primary-card {
+      background: radial-gradient(circle at top right, rgba(46, 204, 113, 0.12), transparent 45%), var(--bg-card);
+      border: 1.5px solid rgba(46, 204, 113, 0.4);
+      border-radius: 28px;
+      padding: 32px;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(46, 204, 113, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .primary-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #2ECC71, #0A84FF, #2ECC71);
+      background-size: 200% 100%;
+      animation: gradientSlide 4s linear infinite;
+    }
+    @keyframes gradientSlide {
+      0% { background-position: 0% 0%; }
+      100% { background-position: 200% 0%; }
+    }
+
+    .option-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .option-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 700;
+      background: #2ECC71;
+      color: #0B0D10;
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+    .platform-compat {
+      font-size: 13px;
+      font-weight: 600;
       color: var(--muted);
+    }
+    .option-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      margin-bottom: 8px;
+    }
+    .option-sub {
+      color: var(--muted-light);
+      font-size: 15.5px;
       max-width: 680px;
-      margin-bottom: 36px;
+      margin-bottom: 28px;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-      margin-bottom: 36px;
-    }
-    .card {
-      background: var(--card);
+
+    /* Device Selector Toolbar */
+    .device-switcher {
+      display: flex;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.35);
       border: 1px solid var(--line);
+      padding: 5px;
+      border-radius: 14px;
+      width: fit-content;
+      margin-bottom: 24px;
+    }
+    .device-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      background: transparent;
+      border: none;
+      color: var(--muted-light);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .device-tab.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    /* Interactive Steps Grid */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .step-card {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 22px;
+      position: relative;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .step-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(46, 204, 113, 0.4);
+    }
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ECC71;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .step-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-desc {
+      font-size: 13.5px;
+      color: var(--muted-light);
+      line-height: 1.5;
+    }
+    .key-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Animated Interactive Safari Mockup */
+    .animation-container {
+      background: #000;
+      border: 1px solid var(--line-bright);
       border-radius: 24px;
-      padding: 28px;
+      padding: 24px;
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .anim-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .anim-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2ECC71;
+      box-shadow: 0 0 10px #2ECC71;
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Phone Mockup Screen */
+    .phone-mockup {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      background: #12141A;
+      border: 2px solid #2B303C;
+      border-radius: 36px;
+      padding: 16px 14px 20px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(46, 204, 113, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .phone-notch {
+      width: 110px;
+      height: 22px;
+      background: #000;
+      border-radius: 20px;
+      margin: 0 auto 12px;
+    }
+    .phone-browser-bar {
+      background: #1C2028;
+      border-radius: 12px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: #9BA1A6;
+      margin-bottom: 12px;
+    }
+    .phone-viewport {
+      background: #0B0D10;
+      border-radius: 18px;
+      height: 240px;
+      position: relative;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .card.dark {
-      background: var(--ink);
+
+    /* Animated Frames Inside Mockup */
+    .anim-frame {
+      display: none;
+      height: 100%;
+      flex-direction: column;
+      justify-content: space-between;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .anim-frame.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Share Bar at bottom of Safari mockup */
+    .safari-bottom-bar {
+      background: #1C2028;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      margin-top: auto;
+    }
+    .safari-btn {
+      color: #9BA1A6;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      position: relative;
+    }
+    .safari-btn.highlight {
+      background: rgba(10, 132, 255, 0.2);
+      color: #0A84FF;
+      box-shadow: 0 0 16px rgba(10, 132, 255, 0.5);
+    }
+    .safari-pointer {
+      position: absolute;
+      top: -38px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: bouncePointer 1.4s ease-in-out infinite;
+    }
+    .pointer-arrow {
+      color: #0A84FF;
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .pointer-pulse-ring {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid #0A84FF;
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      animation: ringPulse 1.4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes bouncePointer {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+    @keyframes ringPulse {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+
+    /* Share Sheet Modal Mockup */
+    .ios-sheet {
+      background: #1C2028;
+      border-radius: 16px 16px 0 0;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ios-sheet-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #252A34;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
       color: #fff;
-      border-color: var(--ink);
     }
-    .tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: var(--brand-light);
-      color: var(--brand);
-      display: inline-block;
-      margin-bottom: 14px;
+    .ios-sheet-item.highlight {
+      background: rgba(46, 204, 113, 0.2);
+      border: 1px solid #2ECC71;
+      box-shadow: 0 0 16px rgba(46, 204, 113, 0.3);
     }
-    .card.dark .tag {
-      background: rgba(255,255,255,0.14);
-      color: #A7F3D0;
-    }
-    .card h2 {
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 10px;
-    }
-    .steps {
-      list-style: none;
-      margin: 18px 0 24px;
+
+    /* Modal Confirmation Add Mockup */
+    .ios-add-modal {
+      background: #1C2028;
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-    .steps li {
+    .modal-nav-row {
       display: flex;
-      gap: 12px;
-      font-size: 14.5px;
-      align-items: flex-start;
-    }
-    .step-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--brand);
-      color: #fff;
-      font-weight: 700;
-      font-size: 12px;
-      display: inline-flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 15px;
-      padding: 15px 22px;
-      border-radius: 14px;
-      transition: opacity 0.15s;
-    }
-    .btn:hover { opacity: 0.92; }
-    .btn-primary {
-      background: var(--brand);
-      color: #fff;
-    }
-    .btn-light {
-      background: #fff;
-      color: var(--ink);
-    }
-    .btn-outline {
-      border: 1px solid rgba(255,255,255,0.24);
-      color: #fff;
-      margin-top: 10px;
-    }
-    .specs {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 16px;
-      padding: 16px;
-      margin: 16px 0 22px;
       font-size: 13.5px;
+      font-weight: 700;
+    }
+    .btn-add-blue {
+      color: #0A84FF;
+      background: rgba(10, 132, 255, 0.18);
+      padding: 4px 12px;
+      border-radius: 8px;
+      animation: pulseAddBtn 1.4s infinite;
+    }
+    @keyframes pulseAddBtn {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(10, 132, 255, 0.4); }
+      50% { transform: scale(1.05); box-shadow: 0 0 12px rgba(10, 132, 255, 0.6); }
+    }
+
+    /* Home Screen Landed Mockup */
+    .home-screen-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 12px;
+    }
+    .landed-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 20px rgba(46, 204, 113, 0.4);
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.4); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Animation Step Controls */
+    .anim-controls {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .step-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--line);
+      color: var(--muted-light);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .step-pill.active {
+      background: #2ECC71;
+      color: #0B0D10;
+      border-color: #2ECC71;
+    }
+
+    /* Action Buttons in Hero Card */
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .btn-launch {
+      background: linear-gradient(135deg, #2ECC71, #1E6F50);
+      color: #fff;
+      font-size: 15.5px;
+      font-weight: 800;
+      padding: 14px 26px;
+      border-radius: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(46, 204, 113, 0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-launch:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(46, 204, 113, 0.5);
+    }
+    .btn-sec {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--line-bright);
+      color: #fff;
+      font-size: 14.5px;
+      font-weight: 700;
+      padding: 14px 22px;
+      border-radius: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .btn-sec:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Option 2 Card */
+    .secondary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 32px;
+      margin-bottom: 40px;
+    }
+    .specs-table {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px 20px;
+      margin: 20px 0 24px;
     }
     .specs-row {
       display: flex;
       justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 14px;
     }
     .specs-row:last-child { border-bottom: none; }
-    .compliance {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 28px;
-    }
+
+    /* Compliance Grid */
     .compliance-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
-      margin-top: 18px;
+      margin-top: 20px;
     }
-    .compliance-item {
-      background: var(--bg);
-      border-radius: 16px;
-      padding: 16px;
+    .compliance-box {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
     }
-    .compliance-item h3 {
+    .compliance-box h4 {
       font-size: 15px;
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      color: #fff;
     }
-    .compliance-item p {
+    .compliance-box p {
       font-size: 13px;
+      color: var(--muted-light);
+      line-height: 1.5;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 30px 20px;
+      text-align: center;
       color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 640px) {
+      .primary-card, .secondary-card { padding: 22px; }
+      .top-right-beacon {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
 <body>
+
+  <!-- Floating Top-Right Pointer Beacon -->
+  <div class="top-right-beacon" id="topRightBeacon" title="Share action location on iPad & In-App Browsers">
+    <div class="beacon-text">
+      <span>On iPad? Tap Share</span>
+      <span class="key-badge">⎋</span>
+    </div>
+    <div class="beacon-arrow">↗</div>
+  </div>
+
   <header>
     <div class="nav">
-      <a href="/" class="logo">foodlog</a>
-      <div class="nav-links">
-        <a href="/pricing">Pricing</a>
-        <a href="/downloads/foodlog-android.apk?v=1.6.0">Android APK</a>
-        <a href="/app" class="cta">Open Web App</a>
+      <a href="/" class="logo-group">
+        <img src="/apple-touch-icon.png" alt="Foodlog Icon" class="app-icon-img" />
+        <span class="logo">foodlog</span>
+      </a>
+      <div class="nav-actions">
+        <a href="/pricing" class="nav-link">Pricing</a>
+        <a href="/downloads/foodlog-android.apk?v=1.6.0" class="nav-link">Android APK</a>
+        <a href="/app" class="nav-btn-app">Open Web App →</a>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <div class="badge"> Foodlog for iPhone &amp; iPad · v1.6.0 (Build 7)</div>
-    <h1>Foodlog on your iPhone.</h1>
+    <div class="hero-badge"> Foodlog for iPhone &amp; iPad · v1.6.0 (Build 7)</div>
+    <h1>Get Foodlog on your iPhone.</h1>
     <p class="lead">
-      Install Foodlog directly to your iPhone Home Screen in 10 seconds with full-screen standalone mode, or download the compiled iOS <code>.ipa</code> bundle for AltStore, Sideloadly, and TestFlight.
+      Install the instant <strong>iPhone &amp; iPad Home Screen App</strong> in 10 seconds via Safari with zero setup, full-screen standalone mode, and offline caching — or download the compiled native iOS <code>.ipa</code> package.
     </p>
 
-    <div class="grid">
-      <div class="card">
-        <div>
-          <span class="tag">Recommended · Instant Install</span>
-          <h2>Install iPhone Web App (PWA)</h2>
-          <p style="color: var(--muted); font-size: 14.5px;">
-            Works on every iPhone &amp; iPad running iOS 15+ with zero certificates or computer required.
-          </p>
-          <ul class="steps">
-            <li>
-              <span class="step-num">1</span>
-              <span>Open <strong>foodlog.xyz/app</strong> in <strong>Safari</strong> on your iPhone.</span>
-            </li>
-            <li>
-              <span class="step-num">2</span>
-              <span>Tap the <strong>Share</strong> button at the bottom of Safari.</span>
-            </li>
-            <li>
-              <span class="step-num">3</span>
-              <span>Tap <strong>"Add to Home Screen"</strong> and tap <strong>Add</strong>.</span>
-            </li>
-          </ul>
-        </div>
-        <a href="/app" class="btn btn-primary">Launch Foodlog Web App →</a>
+    <!-- OPTION 1: INSTANT HOME SCREEN APP (PRIMARY & FIRST OPTION) -->
+    <section class="primary-card" id="option1">
+      <div class="option-header">
+        <span class="option-badge">★ First Option · Recommended</span>
+        <span class="platform-compat">iOS 15+, iPadOS &amp; Modern Safari</span>
       </div>
 
-      <div class="card dark">
-        <div>
-          <span class="tag">Native iOS Package · v1.6.0</span>
-          <h2>Download iOS .IPA Package</h2>
-          <p style="color: #B9B9B4; font-size: 14.5px;">
-            Pre-compiled React Native iOS Hermes bundle (<code>xyz.foodlog.app</code>) with Sign in with Apple, StoreKit 2 IAP, and Apple Pay.
+      <h2 class="option-title">1. Instant iPhone &amp; iPad App (Safari Add to Home Screen)</h2>
+      <p class="option-sub">
+        No App Store wait, no developer certificates, and zero PC required. Installs in 3 simple taps with complete offline logging and camera scanning.
+      </p>
+
+      <!-- Device View Toggle -->
+      <div class="device-switcher">
+        <button class="device-tab active" id="tabIphone" onclick="switchDevice('iphone')">
+          📱 iPhone Safari (Bottom Bar)
+        </button>
+        <button class="device-tab" id="tabIpad" onclick="switchDevice('ipad')">
+          📲 iPad &amp; In-App Browser (Top Right ↗)
+        </button>
+      </div>
+
+      <!-- 3 Clear Step Cards -->
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3 class="step-title">Tap the Share Button</h3>
+          <p class="step-desc" id="step1Desc">
+            Tap the <strong>Share</strong> button <span class="key-badge">⎋ / [↑]</span> at the <strong>bottom of Safari</strong> on your iPhone (or in the <strong>top-right corner</strong> on iPad).
           </p>
-          <div class="specs">
-            <div class="specs-row">
-              <span style="color:#9A9A95">Bundle Identifier</span>
-              <strong style="font-family:'DM Mono',monospace">xyz.foodlog.app</strong>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3 class="step-title">Add to Home Screen</h3>
+          <p class="step-desc">
+            In the iOS share sheet, scroll down and tap <span class="key-badge">➕ Add to Home Screen</span>.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3 class="step-title">Tap Add (Top Right)</h3>
+          <p class="step-desc">
+            Tap <span class="key-badge" style="color:#0A84FF">Add</span> in the top-right corner. <strong>The app icon will appear on your home screen and open in standalone full-screen mode with offline caching.</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Animated Safari Walkthrough Mockup -->
+      <div class="animation-container">
+        <div class="anim-top-bar">
+          <span class="anim-title">
+            <span class="live-dot"></span>
+            Animated Guide: What you should do in Safari
+          </span>
+          <div class="anim-controls">
+            <button class="step-pill active" onclick="setAnimStep(1)">1. Tap Share</button>
+            <button class="step-pill" onclick="setAnimStep(2)">2. Add to Home Screen</button>
+            <button class="step-pill" onclick="setAnimStep(3)">3. Tap Add</button>
+            <button class="step-pill" onclick="setAnimStep(4)">4. Fullscreen App</button>
+          </div>
+        </div>
+
+        <!-- Phone Simulator Mockup -->
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-browser-bar">
+            <span>🔒 foodlog.xyz/app</span>
+            <span id="mockupTopShare" style="display:none; color:#0A84FF; font-weight:800;">[↑] Share</span>
+            <span>Aa</span>
+          </div>
+
+          <div class="phone-viewport">
+            <!-- Frame 1: Tap Share -->
+            <div class="anim-frame active" id="frame1">
+              <div style="text-align:center; padding-top:20px;">
+                <div style="font-size:13px; font-weight:700; color:#6EE7B7;">Step 1: Open foodlog.xyz in Safari</div>
+                <div style="font-size:11.5px; color:#9BA1A6; margin-top:4px;" id="frame1Instruction">
+                  Look at the bottom toolbar and tap the Share button [↑]
+                </div>
+              </div>
+
+              <!-- Safari Bottom Bar Mockup -->
+              <div class="safari-bottom-bar" id="mockupBottomBar">
+                <span class="safari-btn">‹</span>
+                <span class="safari-btn">›</span>
+                <span class="safari-btn highlight" id="mockupShareBtn">
+                  <div class="safari-pointer">
+                    <span class="pointer-arrow">↓</span>
+                    <span style="font-size:9.5px; font-weight:800; color:#0A84FF; white-space:nowrap;">TAP HERE</span>
+                  </div>
+                  <div class="pointer-pulse-ring"></div>
+                  ⎋
+                </span>
+                <span class="safari-btn">📖</span>
+                <span class="safari-btn">▢</span>
+              </div>
             </div>
-            <div class="specs-row">
-              <span style="color:#9A9A95">Version / Build</span>
-              <strong>1.6.0 (Build 7)</strong>
+
+            <!-- Frame 2: Share Sheet -->
+            <div class="anim-frame" id="frame2">
+              <div style="font-size:11.5px; font-weight:700; color:#9BA1A6; margin-bottom:8px;">iOS Share Sheet</div>
+              <div class="ios-sheet">
+                <div class="ios-sheet-item">
+                  <span>Copy Link</span>
+                  <span>🔗</span>
+                </div>
+                <div class="ios-sheet-item highlight">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span style="color:#2ECC71; font-weight:900;">➕</span>
+                    <span style="font-weight:800; color:#fff;">Add to Home Screen</span>
+                  </div>
+                  <span style="color:#2ECC71; font-size:11px; font-weight:800;">TAP</span>
+                </div>
+                <div class="ios-sheet-item">
+                  <span>Add Bookmark</span>
+                  <span>★</span>
+                </div>
+              </div>
             </div>
-            <div class="specs-row">
-              <span style="color:#9A9A95">Privacy Manifest</span>
-              <strong style="color:#6EE7B7">PrivacyInfo.xcprivacy Included</strong>
+
+            <!-- Frame 3: Confirmation Modal -->
+            <div class="anim-frame" id="frame3">
+              <div class="ios-add-modal">
+                <div class="modal-nav-row">
+                  <span style="color:#9BA1A6">Cancel</span>
+                  <span style="font-weight:800; color:#fff;">Add to Home Screen</span>
+                  <span class="btn-add-blue">Add</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px; margin-top:10px; background:#12141A; padding:10px; border-radius:10px;">
+                  <img src="/apple-touch-icon.png" style="width:40px; height:40px; border-radius:10px;" />
+                  <div>
+                    <div style="font-weight:800; font-size:13px; color:#fff;">Foodlog</div>
+                    <div style="font-size:11px; color:#9BA1A6;">https://foodlog.xyz/app</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="specs-row">
-              <span style="color:#9A9A95">Universal Links</span>
-              <strong style="color:#6EE7B7">/.well-known/apple-app-site-association</strong>
+
+            <!-- Frame 4: Home Screen Ready -->
+            <div class="anim-frame" id="frame4">
+              <div class="home-screen-grid">
+                <img src="/apple-touch-icon.png" class="landed-icon" alt="Foodlog Installed" />
+                <div style="font-weight:800; font-size:14px; color:#fff;">Foodlog Installed!</div>
+                <div style="font-size:12px; color:#6EE7B7; line-height:1.4;">
+                  ✓ Standalone Full-Screen Mode<br />✓ Offline Food Database &amp; Meal Caching
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div>
-          <a href="/downloads/foodlog-ios.ipa" download class="btn btn-light" style="width:100%">
-             Download foodlog-ios.ipa
-          </a>
-          <a href="/downloads/foodlog-android.apk?v=1.6.0" class="btn btn-outline" style="width:100%">
-            Switching to Android? Download APK v1.6.0
-          </a>
-        </div>
       </div>
-    </div>
 
-    <div class="compliance">
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">
-        Apple App Store Review Guidelines Compliance
+      <!-- Action Buttons -->
+      <div class="hero-actions">
+        <a href="/app" class="btn-launch">
+          <span>🚀 Launch Foodlog Web App (/app)</span>
+        </a>
+        <a href="#option2" class="btn-sec">
+          <span>📦 Download Native iOS .IPA Package</span>
+        </a>
       </div>
-      <h2 style="margin-top:6px;font-size:22px;font-weight:800;">Built for Apple App Store Standards</h2>
+    </section>
+
+    <!-- OPTION 2: NATIVE COMPILED IOS IPA PACKAGE -->
+    <section class="secondary-card" id="option2">
+      <div class="option-header">
+        <span class="option-badge" style="background:#0A84FF; color:#fff;">Option 2 · Native Binary</span>
+        <span class="platform-compat">AltStore, Sideloadly &amp; TestFlight</span>
+      </div>
+
+      <h2 class="option-title">2. Download Compiled iOS .IPA Package</h2>
+      <p class="option-sub">
+        Compiled React Native + Expo SDK 57 release package (<code>xyz.foodlog.app</code>) built on macOS Xcode 16 with native StoreKit 2 and PassKit Apple Pay support.
+      </p>
+
+      <div class="specs-table">
+        <div class="specs-row">
+          <span style="color:var(--muted)">Bundle Identifier</span>
+          <strong style="font-family:'DM Mono',monospace; color:#6EE7B7;">xyz.foodlog.app</strong>
+        </div>
+        <div class="specs-row">
+          <span style="color:var(--muted)">Version &amp; Build</span>
+          <strong>v1.6.0 (Build 7)</strong>
+        </div>
+        <div class="specs-row">
+          <span style="color:var(--muted)">Apple Universal Links</span>
+          <strong style="color:#6EE7B7;">/.well-known/apple-app-site-association</strong>
+        </div>
+        <div class="specs-row">
+          <span style="color:var(--muted)">Apple Privacy Manifest</span>
+          <strong style="color:#6EE7B7;">PrivacyInfo.xcprivacy (Zero tracking)</strong>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="/downloads/foodlog-ios.ipa" download class="btn-sec" style="background:#fff; color:#0B0D10; font-weight:800;">
+          <span> Download foodlog-ios.ipa (4.4 MB)</span>
+        </a>
+        <a href="/downloads/foodlog-android.apk?v=1.6.0" download class="btn-sec">
+          <span>🤖 Download Android APK (v1.6.0)</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- COMPLIANCE SECTION -->
+    <section class="secondary-card">
+      <h3 style="font-size:20px; font-weight:800; margin-bottom:6px;">Built for Apple App Store Standards</h3>
+      <p style="color:var(--muted-light); font-size:14px;">Every requirement from Apple App Store Review Guidelines is implemented natively:</p>
+
       <div class="compliance-grid">
-        <div class="compliance-item">
-          <h3>Sign in with Apple (4.8)</h3>
-          <p>Native Apple ID sign-in with full support for Hide My Email private relay addresses.</p>
+        <div class="compliance-box">
+          <h4>Sign in with Apple (4.8)</h4>
+          <p>Native authentication with Hide My Email and private relay addresses supported at <code>/api/auth/apple-mobile</code>.</p>
         </div>
-        <div class="compliance-item">
-          <h3>StoreKit 2 &amp; Apple Pay (3.1.1)</h3>
-          <p>AI Photo Scan Passes support App Store In-App Purchase (StoreKit 2) and Apple Pay (PassKit).</p>
+        <div class="compliance-box">
+          <h4>StoreKit 2 &amp; Apple Pay (3.1.1)</h4>
+          <p>AI Photo Scan Passes support StoreKit 2 in-app purchases and Apple Pay (PassKit) checkouts.</p>
         </div>
-        <div class="compliance-item">
-          <h3>PrivacyInfo.xcprivacy</h3>
-          <p>Declares required-reason APIs (CA92.1, C617.1, 35F9.1, E174.1) and zero cross-app tracking.</p>
+        <div class="compliance-box">
+          <h4>PrivacyInfo.xcprivacy</h4>
+          <p>Declares required-reason APIs (UserDefaults, FileTimestamp, BootTime, DiskSpace) with zero tracking.</p>
         </div>
-        <div class="compliance-item">
-          <h3>Account Deletion (5.1.1v)</h3>
-          <p>Immediate in-app and web account &amp; data deletion at <a href="/delete-account" style="color:var(--brand)">/delete-account</a>.</p>
+        <div class="compliance-box">
+          <h4>Account Deletion (5.1.1v)</h4>
+          <p>Instant in-app and web account and data deletion available at <a href="/delete-account" style="color:#2ECC71;">/delete-account</a>.</p>
         </div>
       </div>
-    </div>
+    </section>
   </main>
+
+  <footer>
+    <p>© 2026 Foodlog (xyz.foodlog.app) · Africa's AI Photo Nutrition Tracker · Part of AfroSoftware</p>
+  </footer>
+
+  <script>
+    let currentStep = 1;
+    let animInterval;
+
+    function setAnimStep(step) {
+      currentStep = step;
+      document.querySelectorAll('.anim-frame').forEach((el, idx) => {
+        el.classList.toggle('active', idx === step - 1);
+      });
+      document.querySelectorAll('.step-pill').forEach((el, idx) => {
+        el.classList.toggle('active', idx === step - 1);
+      });
+    }
+
+    function startAutoLoop() {
+      clearInterval(animInterval);
+      animInterval = setInterval(() => {
+        let next = currentStep >= 4 ? 1 : currentStep + 1;
+        setAnimStep(next);
+      }, 3500);
+    }
+
+    function switchDevice(type) {
+      const isIpad = type === 'ipad';
+      document.getElementById('tabIphone').classList.toggle('active', !isIpad);
+      document.getElementById('tabIpad').classList.toggle('active', isIpad);
+      
+      const step1Desc = document.getElementById('step1Desc');
+      const frame1Inst = document.getElementById('frame1Instruction');
+      const topShare = document.getElementById('mockupTopShare');
+      const bottomBar = document.getElementById('mockupBottomBar');
+      const beacon = document.getElementById('topRightBeacon');
+
+      if (isIpad) {
+        step1Desc.innerHTML = 'Look at the <strong>top-right corner</strong> of Safari and tap the <strong>Share</strong> button <span class="key-badge">⎋ / [↑]</span>.';
+        frame1Inst.innerText = 'Look at the top-right toolbar and tap the Share button [↑]';
+        topShare.style.display = 'inline-block';
+        bottomBar.style.display = 'none';
+        beacon.style.borderColor = '#0A84FF';
+      } else {
+        step1Desc.innerHTML = 'Tap the <strong>Share</strong> button <span class="key-badge">⎋ / [↑]</span> at the <strong>bottom of Safari</strong> on your iPhone.';
+        frame1Inst.innerText = 'Look at the bottom toolbar and tap the Share button [↑]';
+        topShare.style.display = 'none';
+        bottomBar.style.display = 'flex';
+        beacon.style.borderColor = 'rgba(46, 204, 113, 0.45)';
+      }
+    }
+
+    // Register Service Worker for offline caching
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
+    startAutoLoop();
+  </script>
 </body>
 </html>

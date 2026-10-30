@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -9,7 +9,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Foodlog">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
   <meta name="description" content="FoodLog is Africa's food & nutrition tracker. Snap a photo of your meal — ugali, jollof, injera, nyama choma — and get calories, protein and macros in seconds. Free, private, African-first.">
   <title>FoodLog — Africa's food &amp; nutrition tracker</title>
   <meta property="og:type" content="website">
@@ -1590,6 +1594,13 @@
         else finishAuthorize();
       })();
     })();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function(){});
+      });
+    }
   </script>
 </body>
 </html>
